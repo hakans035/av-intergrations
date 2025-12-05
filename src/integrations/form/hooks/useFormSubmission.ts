@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { FormAnswers } from '../types';
-import { setClientCsrfToken, getCsrfHeaders } from '@/lib/security/csrf';
+import { setClientCsrfToken, getCsrfHeaders } from '@/lib/security/csrf-client';
 
 interface SubmissionResult {
   success: boolean;
