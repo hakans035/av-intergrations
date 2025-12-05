@@ -1,6 +1,7 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
@@ -10,6 +11,7 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ user }: AdminHeaderProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const supabase = createClient()
 
   const handleSignOut = async () => {
@@ -18,22 +20,41 @@ export function AdminHeader({ user }: AdminHeaderProps) {
     router.refresh()
   }
 
+  const isActive = (path: string) => pathname === path
+
   return (
-    <header className="bg-white border-b border-gray-200">
+    <header className="glass border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-8">
-            <h1 className="text-xl font-bold text-[#307cf1]">AMBITION VALLEY</h1>
-            <nav className="hidden md:flex items-center gap-6">
+            <a href="/admin">
+              <Image
+                src="/av-logo-white.png"
+                alt="Ambition Valley"
+                width={160}
+                height={40}
+                className="h-7 md:h-8 w-auto"
+                priority
+              />
+            </a>
+            <nav className="hidden md:flex items-center gap-2">
               <a
                 href="/admin"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  isActive('/admin')
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
               >
                 Dashboard
               </a>
               <a
                 href="/admin/submissions"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  isActive('/admin/submissions')
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
               >
                 Inzendingen
               </a>
@@ -41,12 +62,12 @@ export function AdminHeader({ user }: AdminHeaderProps) {
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500 hidden sm:block">
+            <span className="text-sm text-white/50 hidden sm:block">
               {user.email}
             </span>
             <button
               onClick={handleSignOut}
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all duration-200"
             >
               Uitloggen
             </button>

@@ -95,49 +95,49 @@ export default async function SubmissionsPage({
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Inzendingen</h1>
-          <p className="mt-1 text-sm text-gray-500">
+        <div className="mb-8 animate-fade-in-up">
+          <h1 className="text-2xl sm:text-3xl font-bold gradient-text">Inzendingen</h1>
+          <p className="mt-1 text-sm text-white/60">
             {total} inzendingen gevonden
           </p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <div className="glass rounded-2xl p-4 mb-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
           <form className="flex flex-wrap gap-4">
             {/* Status Filter */}
             <div>
-              <label htmlFor="status" className="block text-xs font-medium text-gray-500 mb-1">
+              <label htmlFor="status" className="block text-xs font-medium text-white/50 mb-1">
                 Status
               </label>
               <select
                 id="status"
                 name="status"
                 defaultValue={params.status || 'all'}
-                className="block w-40 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#307cf1] focus:border-transparent"
+                className="block w-40 px-3 py-2.5 bg-white/5 border border-white/20 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all"
               >
-                <option value="all">Alle statussen</option>
-                <option value="qualified">Gekwalificeerd</option>
-                <option value="disqualified">Niet gekwalificeerd</option>
-                <option value="partial">Gedeeltelijk</option>
+                <option value="all" className="bg-[#1062eb] text-white">Alle statussen</option>
+                <option value="qualified" className="bg-[#1062eb] text-white">Gekwalificeerd</option>
+                <option value="disqualified" className="bg-[#1062eb] text-white">Niet gekwalificeerd</option>
+                <option value="partial" className="bg-[#1062eb] text-white">Gedeeltelijk</option>
               </select>
             </div>
 
             {/* Source Filter */}
             <div>
-              <label htmlFor="source" className="block text-xs font-medium text-gray-500 mb-1">
+              <label htmlFor="source" className="block text-xs font-medium text-white/50 mb-1">
                 Bron
               </label>
               <select
                 id="source"
                 name="source"
                 defaultValue={params.source || 'all'}
-                className="block w-40 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#307cf1] focus:border-transparent"
+                className="block w-40 px-3 py-2.5 bg-white/5 border border-white/20 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all"
               >
-                <option value="all">Alle bronnen</option>
-                <option value="direct">Direct</option>
+                <option value="all" className="bg-[#1062eb] text-white">Alle bronnen</option>
+                <option value="direct" className="bg-[#1062eb] text-white">Direct</option>
                 {filterOptions.sources.map((source) => (
-                  <option key={source} value={source}>
+                  <option key={source} value={source} className="bg-[#1062eb] text-white">
                     {source}
                   </option>
                 ))}
@@ -148,7 +148,7 @@ export default async function SubmissionsPage({
             <div className="flex items-end">
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-[#307cf1] rounded-lg hover:bg-[#2563eb] transition-colors"
+                className="px-5 py-2.5 text-sm font-medium text-[#1062eb] bg-white rounded-xl hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all"
               >
                 Toepassen
               </button>
@@ -159,7 +159,7 @@ export default async function SubmissionsPage({
               <div className="flex items-end">
                 <a
                   href="/admin/submissions"
-                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                  className="px-4 py-2.5 text-sm font-medium text-white/60 hover:text-white transition-colors"
                 >
                   Filters wissen
                 </a>
@@ -169,29 +169,31 @@ export default async function SubmissionsPage({
         </div>
 
         {/* Table */}
-        <SubmissionsTable submissions={submissions} />
+        <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          <SubmissionsTable submissions={submissions} />
+        </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="mt-6 flex items-center justify-between">
-            <p className="text-sm text-gray-500">
+          <div className="mt-6 flex items-center justify-between animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+            <p className="text-sm text-white/50">
               Pagina {page} van {totalPages}
             </p>
             <div className="flex gap-2">
               {page > 1 && (
                 <a
                   href={`/admin/submissions?page=${page - 1}${params.status ? `&status=${params.status}` : ''}${params.source ? `&source=${params.source}` : ''}`}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2.5 text-sm font-medium text-white/70 bg-white/5 border border-white/20 rounded-xl hover:bg-white/10 hover:text-white transition-all"
                 >
-                  Vorige
+                  ← Vorige
                 </a>
               )}
               {page < totalPages && (
                 <a
                   href={`/admin/submissions?page=${page + 1}${params.status ? `&status=${params.status}` : ''}${params.source ? `&source=${params.source}` : ''}`}
-                  className="px-4 py-2 text-sm font-medium text-white bg-[#307cf1] rounded-lg hover:bg-[#2563eb] transition-colors"
+                  className="px-4 py-2.5 text-sm font-medium text-[#1062eb] bg-white rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all"
                 >
-                  Volgende
+                  Volgende →
                 </a>
               )}
             </div>
