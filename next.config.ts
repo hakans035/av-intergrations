@@ -48,7 +48,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com",
               "font-src 'self'",
-              "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com",
+              "connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://www.googletagmanager.com",
               "frame-ancestors 'self'",
               "form-action 'self'",
               "base-uri 'self'",
