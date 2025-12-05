@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { AdminHeader } from '@/components/admin/AdminHeader'
+import { PeriodFilter } from '@/components/admin/PeriodFilter'
 import { ambitionValleyForm } from '@/integrations/form/data/ambition-valley-form'
 
 interface SearchParams {
@@ -213,22 +214,7 @@ export default async function ResultsPage({
             </div>
 
             {/* Period Filter */}
-            <form className="flex items-center gap-2">
-              <select
-                name="period"
-                defaultValue={period}
-                onChange={(e) => {
-                  const form = e.target.form
-                  if (form) form.submit()
-                }}
-                className="block px-4 py-2.5 bg-white/5 border border-white/20 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all cursor-pointer"
-              >
-                <option value="all" className="bg-[#1062eb] text-white">Alle tijd</option>
-                <option value="7days" className="bg-[#1062eb] text-white">Afgelopen 7 dagen</option>
-                <option value="30days" className="bg-[#1062eb] text-white">Afgelopen 30 dagen</option>
-                <option value="90days" className="bg-[#1062eb] text-white">Afgelopen 90 dagen</option>
-              </select>
-            </form>
+            <PeriodFilter currentPeriod={period} />
           </div>
         </div>
 
