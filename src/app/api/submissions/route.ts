@@ -3,6 +3,8 @@ import { createServiceClient, type Json } from '@/lib/supabase';
 import { formSubmissionSchema } from '@/lib/validation/schemas';
 import { validateCsrfToken } from '@/lib/security/csrf';
 import { rateLimit, getClientIp, getRateLimitHeaders } from '@/lib/security/rate-limit';
+import { sendEmail, renderEmailTemplate, FormSubmissionEmail, getFormEmailSubject } from '@/lib/email';
+import { ambitionValleyForm } from '@/integrations/form/data/ambition-valley-form';
 
 export async function POST(request: Request) {
   try {
@@ -94,6 +96,46 @@ export async function POST(request: Request) {
     if (error) {
       console.error('[API] Supabase insert error:', error);
       throw error;
+    }
+
+    // Send confirmation email if email is present
+    if (email) {
+      try {
+        // Build answers summary with question titles
+        const answersForEmail = buildAnswersSummary(data.answers, data.formId);
+
+        // Render email template
+        const emailProps = {
+          name: name || '',
+          email,
+          qualificationResult,
+          formId: data.formId,
+          answers: answersForEmail,
+        };
+        const { html, subject } = await renderEmailTemplate(
+          FormSubmissionEmail,
+          emailProps,
+          getFormEmailSubject()
+        );
+
+        // Send email (don't await to not block response)
+        sendEmail({
+          to: email,
+          subject,
+          html,
+        }).then((result) => {
+          if (result.success) {
+            console.log('[API] Confirmation email sent:', result.messageId);
+          } else {
+            console.error('[API] Failed to send confirmation email:', result.error);
+          }
+        }).catch((err) => {
+          console.error('[API] Email sending error:', err);
+        });
+      } catch (emailError) {
+        // Log but don't fail the submission
+        console.error('[API] Email preparation error:', emailError);
+      }
     }
 
     // Return success response with rate limit headers
@@ -190,6 +232,80 @@ function determineQualificationResult(
   }
 
   return 'partial';
+}
+
+/**
+ * Build a summary of answers with question titles for the email
+ */
+function buildAnswersSummary(
+  answers: Record<string, unknown>,
+  formId: string
+): Record<string, { question: string; answer: string | string[] }> {
+  const result: Record<string, { question: string; answer: string | string[] }> = {};
+
+  // Get form definition based on formId
+  const formDefinition = formId === ambitionValleyForm.id ? ambitionValleyForm : null;
+
+  for (const [key, value] of Object.entries(answers)) {
+    if (value === undefined || value === null || value === '') continue;
+
+    // Find the field in the form definition to get the question title
+    let questionTitle = key;
+    let displayValue: string | string[] = '';
+
+    if (formDefinition) {
+      const field = formDefinition.fields.find(
+        (f) => f.ref === key || f.id === key
+      );
+
+      if (field) {
+        questionTitle = field.title;
+
+        // Convert answer to display value
+        if (typeof value === 'boolean') {
+          displayValue = value ? 'Ja' : 'Nee';
+        } else if (Array.isArray(value)) {
+          // For multiple choice with multiple selections, map refs to labels
+          displayValue = value.map((v) => {
+            if (field.properties.choices) {
+              const choice = field.properties.choices.find(
+                (c) => c.ref === v || c.label === v
+              );
+              return choice?.label || v;
+            }
+            return v;
+          });
+        } else if (typeof value === 'string') {
+          // For single choice, map ref to label
+          if (field.properties.choices) {
+            const choice = field.properties.choices.find(
+              (c) => c.ref === value || c.label === value
+            );
+            displayValue = choice?.label || value;
+          } else if (value === 'yes') {
+            displayValue = 'Ja';
+          } else if (value === 'no') {
+            displayValue = 'Nee';
+          } else {
+            displayValue = value;
+          }
+        }
+      } else {
+        // Field not found in definition, use raw value
+        displayValue = typeof value === 'string' ? value : String(value);
+      }
+    } else {
+      // No form definition, use raw value
+      displayValue = typeof value === 'string' ? value : String(value);
+    }
+
+    result[key] = {
+      question: questionTitle,
+      answer: displayValue,
+    };
+  }
+
+  return result;
 }
 
 // GET endpoint to retrieve submissions (protected, for admin use)
