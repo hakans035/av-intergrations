@@ -3,6 +3,10 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import type { Database } from './types'
 
+/**
+ * Server client for Server Components and Route Handlers.
+ * Uses publishable key (anon) with cookie-based auth.
+ */
 export async function createClient() {
   const cookieStore = await cookies()
 
@@ -31,8 +35,10 @@ export async function createClient() {
 }
 
 /**
- * Create a Supabase client with service role key for admin operations.
- * Use this for server-side operations that need to bypass RLS.
+ * Service client with elevated privileges for admin operations.
+ * Uses secret key (service_role) - bypasses Row Level Security.
+ *
+ * IMPORTANT: Only use server-side. Never expose to client.
  */
 export function createServiceClient() {
   return createSupabaseClient<Database>(
