@@ -1,0 +1,6 @@
+export { config } from './config'
+export { calculate } from './logic'
+export { CalculatorUI } from './ui'
+export { inputSchema, outputSchema } from './validation'
+export type { SparenVsBeleggenInput, SparenVsBeleggenOutput, RisicoProfiel } from './types'
+export { RISICO_PROFIELEN } from './types'

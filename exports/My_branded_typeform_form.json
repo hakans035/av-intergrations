@@ -1,0 +1,100 @@
+{
+  "id": "VT7eDIaH",
+  "type": "quiz",
+  "title": "My branded typeform",
+  "workspace": {
+    "href": "https://api.typeform.com/workspaces/BNCQ8G"
+  },
+  "theme": {
+    "href": "https://api.typeform.com/themes/ta7VohNS"
+  },
+  "settings": {
+    "language": "en",
+    "progress_bar": "proportion",
+    "meta": {
+      "allow_indexing": false
+    },
+    "hide_navigation": false,
+    "is_public": false,
+    "is_trial": false,
+    "show_progress_bar": true,
+    "show_typeform_branding": true,
+    "are_uploads_public": false,
+    "show_time_to_complete": true,
+    "show_number_of_submissions": false,
+    "show_cookie_consent": false,
+    "show_question_number": true,
+    "show_key_hint_on_choices": true,
+    "autosave_progress": true,
+    "free_form_navigation": false,
+    "use_lead_qualification": false,
+    "pro_subdomain_enabled": false,
+    "auto_translate": true,
+    "partial_responses_to_all_integrations": true
+  },
+  "thankyou_screens": [
+    {
+      "id": "BEAhGNMEpzHV",
+      "ref": "thankyou-screen",
+      "title": "",
+      "type": "thankyou_screen",
+      "properties": {
+        "show_button": true,
+        "share_icons": true,
+        "button_mode": "default_redirect",
+        "button_text": "Create a typeform"
+      }
+    },
+    {
+      "id": "DefaultTyScreen",
+      "ref": "default_tys",
+      "title": "Thanks for completing this typeform\nNow *create your own* — it's free, easy, & beautiful",
+      "type": "thankyou_screen",
+      "properties": {
+        "show_button": true,
+        "share_icons": false,
+        "button_mode": "default_redirect",
+        "button_text": "Create a *typeform*"
+      },
+      "attachment": {
+        "type": "image",
+        "href": "https://public-assets.typeform.com/public/admin/2dpnUBBkz2VN.gif"
+      }
+    }
+  ],
+  "fields": [
+    {
+      "id": "AcySl8NdLiBU",
+      "title": "",
+      "ref": "01K6TGC91D748WHHT0G72JGV41",
+      "properties": {
+        "randomize": false,
+        "allow_multiple_selection": false,
+        "allow_other_choice": false,
+        "vertical_alignment": true,
+        "choices": [
+          {
+            "id": "2QzgipyGPkLm",
+            "ref": "01K6TGCBH2Y3T5X8FE7BAFZ39T",
+            "label": "Choice 1"
+          },
+          {
+            "id": "d40jm9zEJEaO",
+            "ref": "01K6TGCBH2D8CDNG1VWQMGYBHE",
+            "label": "Choice 2"
+          }
+        ]
+      },
+      "validations": {
+        "required": false
+      },
+      "type": "multiple_choice"
+    }
+  ],
+  "created_at": "2025-10-05T15:38:25+00:00",
+  "last_updated_at": "2025-10-05T15:38:25+00:00",
+  "_links": {
+    "display": "https://form.typeform.com/to/VT7eDIaH",
+    "responses": "https://api.typeform.com/forms/VT7eDIaH/responses"
+  }
+}
