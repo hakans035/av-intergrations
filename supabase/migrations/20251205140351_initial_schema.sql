@@ -145,7 +145,7 @@ CREATE TABLE bookings (
   -- Payment
   total_price_cents INTEGER DEFAULT 0,
   deposit_cents INTEGER DEFAULT 0,
-  payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'deposit_paid', 'fully_paid', 'refunded', 'failed')),
+  payment_status TEXT DEFAULT 'pending' CHECK (payment_status IN ('pending', 'not_required', 'deposit_paid', 'fully_paid', 'refunded', 'failed')),
   stripe_payment_intent_id TEXT,
   stripe_checkout_session_id TEXT,
 
@@ -346,7 +346,7 @@ CREATE TABLE invoices (
 );
 
 -- Invoice number sequence
-CREATE SEQUENCE invoice_number_seq START 1;
+CREATE SEQUENCE IF NOT EXISTS invoice_number_seq START 1;
 
 -- Function to generate invoice number
 CREATE OR REPLACE FUNCTION generate_invoice_number()

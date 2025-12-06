@@ -10,63 +10,11 @@
 -- Password: 121272Hs@
 -- ============================================
 
--- Insert admin user into auth.users
-INSERT INTO auth.users (
-  id,
-  instance_id,
-  email,
-  encrypted_password,
-  email_confirmed_at,
-  created_at,
-  updated_at,
-  raw_app_meta_data,
-  raw_user_meta_data,
-  is_super_admin,
-  role,
-  aud,
-  confirmation_token,
-  email_change,
-  email_change_token_new,
-  recovery_token
-) VALUES (
-  'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  '00000000-0000-0000-0000-000000000000',
-  'admin@ambitionvalley.nl',
-  crypt('121272Hs@', gen_salt('bf')),
-  NOW(),
-  NOW(),
-  NOW(),
-  '{"provider": "email", "providers": ["email"]}',
-  '{"name": "Admin"}',
-  false,
-  'authenticated',
-  'authenticated',
-  '',
-  '',
-  '',
-  ''
-) ON CONFLICT (id) DO NOTHING;
-
--- Insert identity for the user
-INSERT INTO auth.identities (
-  id,
-  user_id,
-  identity_data,
-  provider,
-  provider_id,
-  last_sign_in_at,
-  created_at,
-  updated_at
-) VALUES (
-  'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  jsonb_build_object('sub', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'email', 'admin@ambitionvalley.nl'),
-  'email',
-  'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  NOW(),
-  NOW(),
-  NOW()
-) ON CONFLICT (provider, provider_id) DO NOTHING;
+-- Note: Admin user should be created via Supabase Dashboard or Auth API
+-- The crypt/gen_salt functions are not available in remote Supabase
+-- Create user manually at: https://supabase.com/dashboard/project/ckbixrvaktizlarmxxvv/auth/users
+-- Email: admin@ambitionvalley.nl
+-- Password: 121272Hs@
 
 -- ============================================
 -- EVENT TYPES: Booking event types
