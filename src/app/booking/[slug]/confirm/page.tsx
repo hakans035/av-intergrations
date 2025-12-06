@@ -153,9 +153,19 @@ export default function BookingConfirmPage() {
             <CheckCircle className="w-10 h-10 text-green-400" />
           </div>
           <h1 className="text-3xl font-bold gradient-text mb-3">Boeking bevestigd!</h1>
-          <p className="text-white/70 mb-8">
+          <p className="text-white/70 mb-4">
             U ontvangt binnen enkele minuten een bevestigingsmail met alle details.
           </p>
+
+          {/* Spam folder notice */}
+          <div className="glass rounded-xl p-4 mb-8 border border-yellow-400/30 text-left">
+            <p className="text-yellow-200 text-sm leading-relaxed">
+              <strong>Let op:</strong> Controleer ook uw spam/ongewenste e-mail map.
+              Voeg <span className="text-white font-medium">notifications@ambitionvalley.nl</span> toe
+              aan uw contacten om te zorgen dat onze e-mails altijd aankomen.
+            </p>
+          </div>
+
           <a
             href="https://ambitionvalley.nl/"
             className="inline-block px-8 py-4 bg-white text-[#1062eb] rounded-xl font-semibold text-lg hover:bg-white/90 hover:shadow-lg hover:shadow-white/20 transition-all"
@@ -203,6 +213,15 @@ export default function BookingConfirmPage() {
           eventType={eventType}
           meetingUrl={booking.meeting_url}
         />
+
+        {/* Spam folder notice */}
+        <div className="glass rounded-xl p-4 mt-6 border border-yellow-400/30 max-w-lg mx-auto">
+          <p className="text-yellow-200 text-sm leading-relaxed text-center">
+            <strong>Let op:</strong> Controleer ook uw spam/ongewenste e-mail map.
+            Voeg <span className="text-white font-medium">notifications@ambitionvalley.nl</span> toe
+            aan uw contacten om te zorgen dat onze e-mails altijd aankomen.
+          </p>
+        </div>
 
         <div className="mt-8 text-center">
           <a
