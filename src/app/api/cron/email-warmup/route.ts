@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/resend';
 
-// Warmup email addresses - add your own Gmail, Outlook, Yahoo accounts
+// Warmup email addresses - Gmail, Outlook, and business accounts
 const WARMUP_EMAILS = [
   // Microsoft/Outlook accounts
   'hakan@ambitionvalley.nl',
   'ramin@ambitionvalley.nl',
-  // Add your personal emails here:
-  // 'your.gmail@gmail.com',
-  // 'your.outlook@outlook.com',
-  // 'your.yahoo@yahoo.com',
+  'hakansahingoz@outlook.com',
+  'ramin1996@live.nl',
+  // Gmail accounts
+  'hakansahingoz66@gmail.com',
+  // Business accounts
+  'hsahingoz@techknows-it.nl',
 ];
 
 // Warmup schedule (emails per day based on days since start)
