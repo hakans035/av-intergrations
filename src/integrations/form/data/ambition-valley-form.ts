@@ -31,7 +31,7 @@ export const ambitionValleyForm: FormDefinition = {
       type: 'url_redirect',
       properties: {
         redirect_url:
-          'https://ambitionvalley.nl/boeken?name={{field:e4c76d43-32ad-4524-b1c2-006908648e60}}&email={{field:a24de67e-afa1-440f-8bb5-3ca5e82902ad}}&a1={{field:6f2eaa42-cd82-49b5-9c06-ad8d940023f7}}',
+          '/booking?name={{field:e4c76d43-32ad-4524-b1c2-006908648e60}}&email={{field:a24de67e-afa1-440f-8bb5-3ca5e82902ad}}&phone={{field:6f2eaa42-cd82-49b5-9c06-ad8d940023f7}}',
       },
     },
     {
@@ -44,7 +44,7 @@ export const ambitionValleyForm: FormDefinition = {
         share_icons: false,
         button_mode: 'redirect',
         button_text: 'Bekijk alternatieven',
-        redirect_url: 'https://ambitionvalley.nl/boeken#w-tabs-0-data-w-pane-1',
+        redirect_url: '/booking/trajecten',
         description: `Op basis van je antwoorden lijkt het 1-op-1 traject op dit moment niet optimaal voor jou.
 
 Maar goed nieuws: er is wél een alternatief dat perfect aansluit op jouw situatie.

@@ -113,3 +113,7 @@ Required in `.env.local`:
 2. Add files: `config.ts`, `types.ts`, `logic.ts`, `validation.ts`, `ui.tsx`, `index.ts`
 3. Register in `config/calculators.ts`
 4. Export from `calculators/index.ts`
+
+## Deployment
+
+**Important**: Do NOT deploy to Vercel automatically after commits. Only deploy when the user explicitly says "deploy to vercel".

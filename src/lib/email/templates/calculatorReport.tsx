@@ -565,7 +565,7 @@ export const CalculatorReportEmail: React.FC<CalculatorReportEmailProps> = ({ su
                                   Onze experts helpen u graag met het maken van de juiste financiele keuzes.
                                 </p>
                                 <a
-                                  href="https://ambitionvalley.nl/boeken"
+                                  href="https://check.ambitionvalley.nl/booking"
                                   className="cta-button"
                                   style={{
                                     display: 'inline-block',
