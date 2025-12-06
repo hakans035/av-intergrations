@@ -295,28 +295,6 @@ export const BookingReminderEmail: React.FC<BookingReminderEmailProps> = ({
                     {/* Footer */}
                     <tr>
                       <td align="center" style={{ backgroundColor: '#f8fafc', padding: '24px 28px', borderTop: '1px solid #e2e8f0' }}>
-                        {/* Spam folder notice */}
-                        <table
-                          role="presentation"
-                          cellPadding={0}
-                          cellSpacing={0}
-                          width="100%"
-                          style={{
-                            backgroundColor: '#fef3c7',
-                            borderRadius: '8px',
-                            marginBottom: '16px',
-                          }}
-                        >
-                          <tbody>
-                            <tr>
-                              <td style={{ padding: '12px 16px' }}>
-                                <p style={{ fontSize: '12px', color: '#92400e', margin: 0, lineHeight: '1.5' }}>
-                                  <strong>Tip:</strong> Voeg <em>notifications@ambitionvalley.nl</em> toe aan uw contacten zodat onze e-mails altijd in uw inbox terechtkomen.
-                                </p>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
                         <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 8px 0' }}>
                           <a href="mailto:info@ambitionvalley.nl" style={{ color: '#307cf1', textDecoration: 'none' }}>
                             info@ambitionvalley.nl
