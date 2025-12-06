@@ -29,3 +29,7 @@ export type { BookingReminderEmailProps } from './templates/bookingReminder'
 // Intake follow-up email template
 export { IntakeFollowUpEmail, getIntakeFollowUpSubject } from './templates/intakeFollowUp'
 export type { IntakeFollowUpEmailProps } from './templates/intakeFollowUp'
+
+// Invoice email template
+export { InvoiceEmail, getInvoiceEmailSubject } from './templates/invoiceEmail'
+export type { InvoiceEmailProps } from './templates/invoiceEmail'

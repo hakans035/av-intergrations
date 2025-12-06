@@ -295,3 +295,83 @@ CREATE POLICY "Service role full access email_workflows" ON email_workflows
 
 CREATE POLICY "Service role full access email_logs" ON email_logs
   FOR ALL TO service_role USING (true);
+
+-- ============================================
+-- INVOICE SYSTEM TABLES
+-- ============================================
+
+-- Invoices table
+CREATE TABLE invoices (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  -- Invoice identification
+  invoice_number TEXT UNIQUE NOT NULL,  -- e.g., AV-2025-0001
+  booking_id UUID REFERENCES bookings(id) ON DELETE SET NULL,
+
+  -- Stripe references
+  stripe_invoice_id TEXT,
+  stripe_customer_id TEXT,
+  stripe_payment_intent_id TEXT,
+
+  -- Customer info (denormalized for historical record)
+  customer_name TEXT NOT NULL,
+  customer_email TEXT NOT NULL,
+  customer_phone TEXT,
+
+  -- Invoice details
+  description TEXT NOT NULL,
+  currency TEXT DEFAULT 'EUR',
+  line_items JSONB NOT NULL,  -- [{description, quantity, unit_price_cents, total_cents}]
+
+  -- Amount breakdown
+  subtotal_cents INTEGER NOT NULL,
+  btw_percent NUMERIC(5,2) DEFAULT 21.00,
+  btw_amount_cents INTEGER NOT NULL,
+  total_cents INTEGER NOT NULL,
+
+  -- Invoice type and status
+  invoice_type TEXT NOT NULL CHECK (invoice_type IN ('deposit', 'balance', 'full_payment', 'refund')),
+  status TEXT DEFAULT 'paid' CHECK (status IN ('draft', 'paid', 'voided', 'refunded')),
+
+  -- PDF storage
+  pdf_url TEXT,  -- Supabase Storage URL
+  pdf_path TEXT,  -- Storage path: invoices/2025/AV-2025-0001.pdf
+  stripe_pdf_url TEXT,  -- Original Stripe hosted URL
+
+  -- Timestamps
+  invoice_date TIMESTAMPTZ DEFAULT NOW(),
+  paid_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Invoice number sequence
+CREATE SEQUENCE invoice_number_seq START 1;
+
+-- Function to generate invoice number
+CREATE OR REPLACE FUNCTION generate_invoice_number()
+RETURNS TEXT AS $$
+DECLARE
+  next_val INTEGER;
+  current_year TEXT;
+BEGIN
+  next_val := nextval('invoice_number_seq');
+  current_year := EXTRACT(YEAR FROM NOW())::TEXT;
+  RETURN 'AV-' || current_year || '-' || LPAD(next_val::TEXT, 4, '0');
+END;
+$$ LANGUAGE plpgsql;
+
+-- Invoice Indexes
+CREATE INDEX idx_invoices_booking ON invoices(booking_id);
+CREATE INDEX idx_invoices_number ON invoices(invoice_number);
+CREATE INDEX idx_invoices_customer_email ON invoices(customer_email);
+CREATE INDEX idx_invoices_status ON invoices(status);
+CREATE INDEX idx_invoices_date ON invoices(invoice_date);
+CREATE INDEX idx_invoices_stripe ON invoices(stripe_invoice_id);
+
+-- Invoice RLS
+ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
+
+-- Service role full access
+CREATE POLICY "Service role full access invoices" ON invoices
+  FOR ALL TO service_role USING (true);

@@ -473,6 +473,98 @@ export type Database = {
         }
         Relationships: []
       }
+      invoices: {
+        Row: {
+          id: string
+          invoice_number: string
+          booking_id: string | null
+          stripe_invoice_id: string | null
+          stripe_customer_id: string | null
+          stripe_payment_intent_id: string | null
+          customer_name: string
+          customer_email: string
+          customer_phone: string | null
+          description: string
+          currency: string
+          line_items: Json
+          subtotal_cents: number
+          btw_percent: number
+          btw_amount_cents: number
+          total_cents: number
+          invoice_type: string
+          status: string
+          pdf_url: string | null
+          pdf_path: string | null
+          stripe_pdf_url: string | null
+          invoice_date: string
+          paid_at: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          invoice_number: string
+          booking_id?: string | null
+          stripe_invoice_id?: string | null
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          customer_name: string
+          customer_email: string
+          customer_phone?: string | null
+          description: string
+          currency?: string
+          line_items: Json
+          subtotal_cents: number
+          btw_percent?: number
+          btw_amount_cents: number
+          total_cents: number
+          invoice_type: string
+          status?: string
+          pdf_url?: string | null
+          pdf_path?: string | null
+          stripe_pdf_url?: string | null
+          invoice_date?: string
+          paid_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          invoice_number?: string
+          booking_id?: string | null
+          stripe_invoice_id?: string | null
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          customer_name?: string
+          customer_email?: string
+          customer_phone?: string | null
+          description?: string
+          currency?: string
+          line_items?: Json
+          subtotal_cents?: number
+          btw_percent?: number
+          btw_amount_cents?: number
+          total_cents?: number
+          invoice_type?: string
+          status?: string
+          pdf_url?: string | null
+          pdf_path?: string | null
+          stripe_pdf_url?: string | null
+          invoice_date?: string
+          paid_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       form_submissions: {
         Row: {
           answers: Json
@@ -547,7 +639,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_invoice_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
@@ -693,4 +788,9 @@ export type FormSubmissionUpdate = TablesUpdate<'form_submissions'>
 export type FormEvent = Tables<'form_events'>
 export type FormEventInsert = TablesInsert<'form_events'>
 export type FormEventUpdate = TablesUpdate<'form_events'>
+
+// Type aliases for invoices
+export type Invoice = Tables<'invoices'>
+export type InvoiceInsert = TablesInsert<'invoices'>
+export type InvoiceUpdate = TablesUpdate<'invoices'>
 

@@ -88,6 +88,16 @@ export function AdminHeader({ user }: AdminHeaderProps) {
               >
                 E-mail
               </a>
+              <a
+                href="/admin/invoices"
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  pathname.startsWith('/admin/invoices')
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                Facturen
+              </a>
             </nav>
           </div>
 

@@ -3,9 +3,11 @@ import { createServiceClient } from '@/lib/supabase';
 import {
   constructWebhookEvent,
   extractBookingMetadata,
+  calculateDeposit,
 } from '@/integrations/booking/lib/stripe';
 import { createBookingWithMeeting } from '@/integrations/booking/lib/microsoft-graph';
 import { sendBookingEmails } from '@/lib/email/workflows';
+import { processInvoiceGeneration } from '@/integrations/booking/lib/invoicing';
 import type { EventType, Booking } from '@/integrations/booking/types';
 
 // POST: Handle Stripe webhooks
@@ -114,6 +116,47 @@ export async function POST(request: Request) {
           }
         }
 
+        // Generate invoice for paid bookings
+        if (eventType.price_cents > 0) {
+          try {
+            const paymentIntentId = (event.data.object as { payment_intent?: string }).payment_intent;
+            const amountPaid = metadata.isDeposit
+              ? calculateDeposit(eventType)
+              : eventType.price_cents;
+
+            // Format event date for invoice
+            const eventDate = new Date(booking.start_time).toLocaleDateString('nl-NL', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            });
+
+            const invoiceResult = await processInvoiceGeneration({
+              bookingId: metadata.bookingId,
+              paymentIntentId: paymentIntentId || '',
+              invoiceType: metadata.isDeposit ? 'deposit' : 'full_payment',
+              amountPaidCents: amountPaid,
+              customerName: booking.customer_name,
+              customerEmail: booking.customer_email,
+              customerPhone: booking.customer_phone ?? undefined,
+              eventTitle: eventType.title,
+              eventDate,
+            });
+
+            if (invoiceResult.success) {
+              console.log('[Webhook] Invoice generated:', invoiceResult.invoice?.invoice_number);
+            } else {
+              console.error('[Webhook] Invoice generation failed:', invoiceResult.error);
+            }
+          } catch (invoiceError) {
+            console.error('[Webhook] Failed to generate invoice:', invoiceError);
+            // Don't fail the webhook - invoice generation is non-critical
+          }
+        }
+
         console.log('[Webhook] Checkout completed for booking:', metadata.bookingId);
         break;
       }
@@ -122,6 +165,13 @@ export async function POST(request: Request) {
         const metadata = extractBookingMetadata(event);
 
         if (metadata.bookingId && metadata.isBalancePayment) {
+          // Get booking details for invoice
+          const { data: booking } = await supabase
+            .from('bookings')
+            .select('*, event_types(*)')
+            .eq('id', metadata.bookingId)
+            .single();
+
           // Update to fully paid
           await supabase
             .from('bookings')
@@ -131,6 +181,42 @@ export async function POST(request: Request) {
             .eq('id', metadata.bookingId);
 
           console.log('[Webhook] Balance payment received for booking:', metadata.bookingId);
+
+          // Generate balance invoice
+          if (booking && booking.event_types) {
+            try {
+              const eventType = booking.event_types as EventType;
+              const paymentIntent = event.data.object as { id: string; amount: number };
+              const balanceAmount = paymentIntent.amount;
+
+              const eventDate = new Date(booking.start_time).toLocaleDateString('nl-NL', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              });
+
+              const invoiceResult = await processInvoiceGeneration({
+                bookingId: metadata.bookingId,
+                paymentIntentId: paymentIntent.id,
+                invoiceType: 'balance',
+                amountPaidCents: balanceAmount,
+                customerName: booking.customer_name,
+                customerEmail: booking.customer_email,
+                customerPhone: booking.customer_phone ?? undefined,
+                eventTitle: eventType.title,
+                eventDate,
+              });
+
+              if (invoiceResult.success) {
+                console.log('[Webhook] Balance invoice generated:', invoiceResult.invoice?.invoice_number);
+              }
+            } catch (invoiceError) {
+              console.error('[Webhook] Failed to generate balance invoice:', invoiceError);
+            }
+          }
         }
         break;
       }

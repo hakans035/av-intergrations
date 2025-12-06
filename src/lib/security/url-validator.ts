@@ -12,12 +12,29 @@ const ALLOWED_REDIRECT_HOSTS = [
 const FALLBACK_URL = 'https://ambitionvalley.nl';
 
 /**
+ * Checks if a URL is a safe relative path
+ * Only allows paths starting with / and not //
+ */
+export function isRelativePath(url: string): boolean {
+  if (!url || typeof url !== 'string') {
+    return false;
+  }
+  // Must start with / but not // (protocol-relative URL)
+  return url.startsWith('/') && !url.startsWith('//');
+}
+
+/**
  * Validates if a URL is safe for redirect
- * Only allows HTTPS URLs to whitelisted domains
+ * Allows relative URLs and HTTPS URLs to whitelisted domains
  */
 export function isValidRedirectUrl(url: string): boolean {
   if (!url || typeof url !== 'string') {
     return false;
+  }
+
+  // Allow relative URLs (safe - stays on same domain)
+  if (isRelativePath(url)) {
+    return true;
   }
 
   try {
