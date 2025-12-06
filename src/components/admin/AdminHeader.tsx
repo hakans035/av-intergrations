@@ -78,6 +78,16 @@ export function AdminHeader({ user }: AdminHeaderProps) {
               >
                 Boekingen
               </a>
+              <a
+                href="/admin/email-workflows"
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  pathname.startsWith('/admin/email')
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                E-mail
+              </a>
             </nav>
           </div>
 
