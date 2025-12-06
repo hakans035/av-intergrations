@@ -20,10 +20,40 @@ npm run test:e2e:ui      # Run E2E tests with UI
 npm run lint             # ESLint
 npm run typecheck        # TypeScript type checking
 
-# Database (Supabase)
-npm run db:push          # Push schema to Supabase
-npm run db:pull          # Pull schema from Supabase
+# Database (Supabase Local Development)
+npx supabase start       # Start local Supabase (Docker required)
+npx supabase stop        # Stop local Supabase
+npx supabase db reset    # Reset local database and apply migrations
+npx supabase status      # Show local Supabase status and URLs
+
+# Database (Supabase Remote)
+npm run db:push          # Push schema to remote Supabase
+npm run db:pull          # Pull schema from remote Supabase
 npm run db:migration     # Create new migration
+
+# Generate TypeScript types from local database
+npx supabase gen types typescript --local > src/lib/supabase/types.ts
+```
+
+## Local Development Setup
+
+For local development, use the local Supabase instance:
+
+```bash
+# Start local Supabase (requires Docker)
+npx supabase start
+```
+
+Local Supabase URLs:
+- **Studio**: http://127.0.0.1:54323
+- **API URL**: http://127.0.0.1:54321
+- **Database**: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+
+For local development, create `.env.local` with:
+```env
+NEXT_PUBLIC_SUPABASE_URL="http://127.0.0.1:54321"
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="<from supabase start output>"
+SUPABASE_SECRET_KEY="<from supabase start output>"
 ```
 
 ## Architecture

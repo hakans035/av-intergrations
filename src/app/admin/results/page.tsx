@@ -97,7 +97,7 @@ async function getFormAnalytics(period: string): Promise<FormAnalytics> {
     if (timesWithDuration.length > 0) {
       const totalSeconds = timesWithDuration.reduce((acc, s) => {
         const start = new Date(s.started_at!).getTime()
-        const end = new Date(s.completed_at).getTime()
+        const end = new Date(s.completed_at!).getTime()
         return acc + (end - start) / 1000
       }, 0)
       avgTimeSeconds = totalSeconds / timesWithDuration.length

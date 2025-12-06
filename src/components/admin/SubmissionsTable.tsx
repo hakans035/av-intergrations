@@ -23,7 +23,8 @@ const qualificationLabels: Record<string, { label: string; className: string }> 
   },
 }
 
-function formatDate(dateString: string): string {
+function formatDate(dateString: string | null): string {
+  if (!dateString) return '-'
   const date = new Date(dateString)
   return new Intl.DateTimeFormat('nl-NL', {
     day: '2-digit',
@@ -34,7 +35,8 @@ function formatDate(dateString: string): string {
   }).format(date)
 }
 
-function formatRelativeTime(dateString: string): string {
+function formatRelativeTime(dateString: string | null): string {
+  if (!dateString) return '-'
   const date = new Date(dateString)
   const now = new Date()
   const diffMs = now.getTime() - date.getTime()

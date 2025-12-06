@@ -22,6 +22,14 @@ export const metadata: Metadata = {
   title: "Ambition Valley - Belasting Check",
   description: "Doe de gratis 2-minuten check: Deelnemers besparen gemiddeld €3.000 tot €15.000 belasting per jaar",
   metadataBase: new URL("https://check.ambitionvalley.nl"),
+  icons: {
+    icon: [
+      { url: "/av-favicon.png", type: "image/png" },
+    ],
+    apple: [
+      { url: "/av-webclip.ico", sizes: "180x180" },
+    ],
+  },
   openGraph: {
     title: "Ambition Valley - Belasting Check",
     description: "Doe de gratis 2-minuten check: Deelnemers besparen gemiddeld €3.000 tot €15.000 belasting per jaar",

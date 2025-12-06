@@ -68,6 +68,16 @@ export function AdminHeader({ user }: AdminHeaderProps) {
               >
                 Inzendingen
               </a>
+              <a
+                href="/admin/booking"
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  pathname.startsWith('/admin/booking')
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                Boekingen
+              </a>
             </nav>
           </div>
 

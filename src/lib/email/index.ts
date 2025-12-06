@@ -13,3 +13,19 @@ export type { CalculatorReportEmailProps, EmailSummaryData, CalculatorType } fro
 // Form submission email template
 export { FormSubmissionEmail, getFormEmailSubject } from './templates/formSubmission'
 export type { FormSubmissionEmailProps } from './templates/formSubmission'
+
+// Booking confirmation email template
+export { BookingConfirmationEmail, getBookingConfirmationSubject } from './templates/bookingConfirmation'
+export type { BookingConfirmationEmailProps } from './templates/bookingConfirmation'
+
+// Booking cancellation email template
+export { BookingCancellationEmail, getBookingCancellationSubject } from './templates/bookingCancellation'
+export type { BookingCancellationEmailProps } from './templates/bookingCancellation'
+
+// Booking reminder email template
+export { BookingReminderEmail, getBookingReminderSubject } from './templates/bookingReminder'
+export type { BookingReminderEmailProps } from './templates/bookingReminder'
+
+// Intake follow-up email template
+export { IntakeFollowUpEmail, getIntakeFollowUpSubject } from './templates/intakeFollowUp'
+export type { IntakeFollowUpEmailProps } from './templates/intakeFollowUp'
