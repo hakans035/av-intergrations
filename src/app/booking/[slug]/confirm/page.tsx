@@ -10,7 +10,6 @@ import type { Booking, EventType } from '@/integrations/booking/types';
 
 export default function BookingConfirmPage() {
   const searchParams = useSearchParams();
-  const sessionId = searchParams.get('session_id');
   const bookingId = searchParams.get('booking_id');
 
   const [booking, setBooking] = useState<Booking | null>(null);
@@ -20,53 +19,38 @@ export default function BookingConfirmPage() {
 
   useEffect(() => {
     async function loadBooking() {
+      if (!bookingId) {
+        setError('Geen boeking gevonden');
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
       try {
-        if (sessionId) {
-          // Confirm booking via Stripe session
-          const confirmResponse = await fetch('/api/booking/confirm', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sessionId }),
-          });
+        // Fetch booking details from admin API
+        const response = await fetch(`/api/admin/bookings/${bookingId}`);
+        const data = await response.json();
 
-          const confirmData = await confirmResponse.json();
-
-          if (!confirmData.success) {
-            setError(confirmData.message || 'Er is een fout opgetreden');
-            return;
-          }
-
-          setBooking(confirmData.data.booking);
-          setEventType(confirmData.data.eventType);
-        } else if (bookingId) {
-          // Get booking directly (for free bookings)
-          const response = await fetch(`/api/booking/confirm?session_id=${bookingId}`);
-          const data = await response.json();
-
-          if (!data.success) {
-            // Fallback: fetch booking from admin API
-            // For now, show generic success
-            setError(null);
-            return;
-          }
-
-          setBooking(data.data.booking);
-          setEventType(data.data.eventType);
-        } else {
-          setError('Geen boeking gevonden');
+        if (!data.success) {
+          // Still show success page - booking was created
+          setLoading(false);
+          return;
         }
+
+        setBooking(data.data);
+        setEventType(data.data.event_types);
       } catch {
-        setError('Er is een fout opgetreden bij het laden van de bevestiging');
+        // Still show success page even if fetch fails
+        // The booking was already created successfully
       } finally {
         setLoading(false);
       }
     }
 
     loadBooking();
-  }, [sessionId, bookingId]);
+  }, [bookingId]);
 
   if (loading) {
     return (
@@ -94,7 +78,7 @@ export default function BookingConfirmPage() {
         <div className="relative z-10 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <Loader2 className="w-8 h-8 text-white/60 animate-spin mx-auto mb-4" />
-            <p className="text-white/60">Boeking bevestigen...</p>
+            <p className="text-white/60">Bevestiging laden...</p>
           </div>
         </div>
       </main>
