@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
 import { AlertCircle, Loader2, CheckCircle } from 'lucide-react';
 import { BookingConfirmation } from '@/integrations/booking/components';
@@ -63,7 +62,7 @@ export default function BookingConfirmPage() {
 
         {/* Logo */}
         <header className="absolute top-8 left-8 md:top-10 md:left-10 z-10">
-          <Link href="/">
+          <a href="https://ambitionvalley.nl/">
             <Image
               src="/av-logo-white.png"
               alt="Ambition Valley"
@@ -72,7 +71,7 @@ export default function BookingConfirmPage() {
               className="h-8 md:h-10 w-auto"
               priority
             />
-          </Link>
+          </a>
         </header>
 
         <div className="relative z-10 flex items-center justify-center min-h-screen">
@@ -96,7 +95,7 @@ export default function BookingConfirmPage() {
 
         {/* Logo */}
         <header className="absolute top-8 left-8 md:top-10 md:left-10 z-10">
-          <Link href="/">
+          <a href="https://ambitionvalley.nl/">
             <Image
               src="/av-logo-white.png"
               alt="Ambition Valley"
@@ -105,19 +104,19 @@ export default function BookingConfirmPage() {
               className="h-8 md:h-10 w-auto"
               priority
             />
-          </Link>
+          </a>
         </header>
 
         <div className="relative z-10 max-w-lg mx-auto px-4 pt-28 pb-12">
           <div className="glass rounded-2xl p-6 text-center border border-red-400/30 animate-fade-in-up">
             <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
             <p className="text-red-300 mb-4">{error}</p>
-            <Link
-              href="/booking"
+            <a
+              href="https://ambitionvalley.nl/"
               className="inline-block px-6 py-3 bg-white text-[#1062eb] rounded-xl font-semibold hover:bg-white/90 transition-colors"
             >
-              Terug naar boeken
-            </Link>
+              Terug naar website
+            </a>
           </div>
         </div>
       </main>
@@ -137,7 +136,7 @@ export default function BookingConfirmPage() {
 
         {/* Logo */}
         <header className="absolute top-8 left-8 md:top-10 md:left-10 z-10">
-          <Link href="/">
+          <a href="https://ambitionvalley.nl/">
             <Image
               src="/av-logo-white.png"
               alt="Ambition Valley"
@@ -146,7 +145,7 @@ export default function BookingConfirmPage() {
               className="h-8 md:h-10 w-auto"
               priority
             />
-          </Link>
+          </a>
         </header>
 
         <div className="relative z-10 max-w-lg mx-auto px-4 pt-28 pb-12 text-center animate-fade-in-up">
@@ -157,12 +156,12 @@ export default function BookingConfirmPage() {
           <p className="text-white/70 mb-8">
             U ontvangt binnen enkele minuten een bevestigingsmail met alle details.
           </p>
-          <Link
-            href="/booking"
+          <a
+            href="https://ambitionvalley.nl/"
             className="inline-block px-8 py-4 bg-white text-[#1062eb] rounded-xl font-semibold text-lg hover:bg-white/90 hover:shadow-lg hover:shadow-white/20 transition-all"
           >
-            Terug naar boeken
-          </Link>
+            Terug naar website
+          </a>
         </div>
       </main>
     );
@@ -186,7 +185,7 @@ export default function BookingConfirmPage() {
 
       {/* Logo */}
       <header className="absolute top-8 left-8 md:top-10 md:left-10 z-10">
-        <Link href="/">
+        <a href="https://ambitionvalley.nl/">
           <Image
             src="/av-logo-white.png"
             alt="Ambition Valley"
@@ -195,7 +194,7 @@ export default function BookingConfirmPage() {
             className="h-8 md:h-10 w-auto"
             priority
           />
-        </Link>
+        </a>
       </header>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 pt-28 pb-12 animate-fade-in-up">
@@ -206,12 +205,12 @@ export default function BookingConfirmPage() {
         />
 
         <div className="mt-8 text-center">
-          <Link
-            href="/booking"
+          <a
+            href="https://ambitionvalley.nl/"
             className="text-white/60 hover:text-white transition-colors"
           >
-            Nog een afspraak boeken
-          </Link>
+            Terug naar website
+          </a>
         </div>
       </div>
     </main>
