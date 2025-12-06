@@ -6,8 +6,6 @@ export interface BookingCancellationEmailProps {
   eventTitle: string;
   eventDate: string;
   eventTime: string;
-  refunded: boolean;
-  refundAmount?: string;
 }
 
 export const getBookingCancellationSubject = (): string => {
@@ -19,8 +17,6 @@ export const BookingCancellationEmail: React.FC<BookingCancellationEmailProps> =
   eventTitle,
   eventDate,
   eventTime,
-  refunded,
-  refundAmount,
 }) => {
   const displayName = customerName || 'Beste';
 
@@ -127,39 +123,6 @@ export const BookingCancellationEmail: React.FC<BookingCancellationEmailProps> =
                             </tr>
                           </tbody>
                         </table>
-
-                        {/* Refund Info */}
-                        {refunded && (
-                          <table
-                            role="presentation"
-                            cellPadding={0}
-                            cellSpacing={0}
-                            width="100%"
-                            style={{
-                              backgroundColor: '#f0fdf4',
-                              borderLeft: '4px solid #10b981',
-                              borderRadius: '0 8px 8px 0',
-                              marginBottom: '24px',
-                            }}
-                          >
-                            <tbody>
-                              <tr>
-                                <td style={{ padding: '20px' }}>
-                                  <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: '#166534', margin: '0 0 8px 0' }}>
-                                    Terugbetaling
-                                  </h4>
-                                  <p style={{ fontSize: '14px', color: '#166534', margin: 0 }}>
-                                    {refundAmount ? (
-                                      <>Een bedrag van <strong>{refundAmount}</strong> wordt binnen 5-10 werkdagen teruggestort op uw rekening.</>
-                                    ) : (
-                                      <>Het betaalde bedrag wordt binnen 5-10 werkdagen teruggestort op uw rekening.</>
-                                    )}
-                                  </p>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        )}
 
                         {/* Divider */}
                         <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">

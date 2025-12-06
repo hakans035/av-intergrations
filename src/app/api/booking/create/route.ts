@@ -2,10 +2,6 @@ import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { z } from 'zod';
 import {
-  createCheckoutSession,
-  calculateDeposit,
-} from '@/integrations/booking/lib/stripe';
-import {
   createBookingWithMeeting,
 } from '@/integrations/booking/lib/microsoft-graph';
 import { isSlotAvailable } from '@/integrations/booking/lib/availability';
@@ -105,14 +101,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Calculate deposit
-    const depositCents = calculateDeposit(eventType as EventType);
-    const requiresPayment = (eventType.price_cents ?? 0) > 0;
+    // Determine initial status (confirmed unless requires manual approval)
+    const initialStatus = eventType.requires_approval ? 'pending' : 'confirmed';
 
-    // Determine initial status
-    const initialStatus = requiresPayment ? 'pending' : (eventType.requires_approval ? 'pending' : 'confirmed');
-
-    // Create booking record
+    // Create booking record - no payment required, invoice sent manually later
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
       .insert({
@@ -125,9 +117,9 @@ export async function POST(request: Request) {
         start_time: startTime.toISOString(),
         end_time: endTime.toISOString(),
         timezone: data.timezone,
-        total_price_cents: eventType.price_cents,
-        deposit_cents: depositCents,
-        payment_status: requiresPayment ? 'pending' : 'fully_paid',
+        total_price_cents: eventType.price_cents || 0,
+        deposit_cents: 0,
+        payment_status: 'not_required',
         status: initialStatus,
       })
       .select()
@@ -155,36 +147,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // If payment required, create Stripe checkout session
-    if (requiresPayment) {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://ambitionvalley.nl';
-      const checkoutSession = await createCheckoutSession({
-        booking: booking as Booking,
-        eventType: eventType as EventType,
-        successUrl: `${baseUrl}/booking/${eventType.slug}/confirm`,
-        cancelUrl: `${baseUrl}/booking/${eventType.slug}?cancelled=true`,
-        depositOnly: true,
-      });
-
-      // Update booking with Stripe session ID
-      await supabase
-        .from('bookings')
-        .update({
-          stripe_checkout_session_id: checkoutSession.id,
-        })
-        .eq('id', booking.id);
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          booking,
-          checkoutUrl: checkoutSession.url,
-          requiresPayment: true,
-        },
-      });
-    }
-
-    // If no payment required and auto-confirmed, create calendar event
+    // Create calendar event for confirmed bookings
     if (initialStatus === 'confirmed') {
       try {
         const { calendarEvent, meetingUrl } = await createBookingWithMeeting(
@@ -208,7 +171,7 @@ export async function POST(request: Request) {
         // Continue without calendar event - booking is still valid
       }
 
-      // Send booking confirmation emails (for free bookings that are auto-confirmed)
+      // Send booking confirmation emails
       try {
         await sendBookingEmails(booking.id, 'booking_confirmed');
         console.log('[API] Booking confirmation emails triggered for:', booking.id);
@@ -222,7 +185,6 @@ export async function POST(request: Request) {
       success: true,
       data: {
         booking,
-        requiresPayment: false,
       },
     });
   } catch (error) {

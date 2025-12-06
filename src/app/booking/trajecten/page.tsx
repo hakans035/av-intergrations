@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { createServiceClient } from '@/lib/supabase';
 import type { EventType } from '@/integrations/booking/types';
-import { Clock, Video, Users, MapPin, Euro, ArrowRight, Diamond, Crown, Gem } from 'lucide-react';
+import { Clock, Video, Users, MapPin, Euro, ArrowRight, Target, Rocket, UsersRound } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Kies jouw Traject - Ambition Valley',
@@ -48,9 +48,9 @@ const locationLabels: Record<string, string> = {
 
 // Icons for each package type
 const packageIcons: Record<string, React.ReactNode> = {
-  'financieel-fundament': <Diamond className="w-8 h-8" />,
-  'private-wealth': <Crown className="w-8 h-8" />,
-  'ambition-wealth-circle': <Gem className="w-8 h-8" />,
+  'financieel-fundament': <Target className="w-8 h-8" />,
+  'private-wealth': <Rocket className="w-8 h-8" />,
+  'ambition-wealth-circle': <UsersRound className="w-8 h-8" />,
 };
 
 // Feature lists for each package
@@ -143,7 +143,7 @@ export default async function TrajectenPage() {
               >
                 {/* Icon */}
                 <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-4 text-blue-200">
-                  {packageIcons[eventType.slug] || <Diamond className="w-8 h-8" />}
+                  {packageIcons[eventType.slug] || <Target className="w-8 h-8" />}
                 </div>
 
                 {/* Title */}
@@ -209,7 +209,7 @@ export default async function TrajectenPage() {
                   href={`/booking/${eventType.slug}`}
                   className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-[#1062eb] rounded-xl font-semibold hover:bg-white/90 hover:shadow-lg hover:shadow-white/20 transition-all group"
                 >
-                  Plan een gratis intake
+                  {eventType.slug === 'ambition-wealth-circle' ? 'Meld je aan' : 'Plan jouw onboarding'}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>

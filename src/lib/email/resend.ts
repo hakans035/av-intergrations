@@ -1,8 +1,14 @@
 import { Resend } from 'resend'
 
 // Email configuration - domain verified in Resend
-const FROM_EMAIL = 'Ambition Valley <rapport@ambitionvalley.nl>'
+// Two sender addresses for different purposes:
+// - rapport: for calculator reports only
+// - notifications: for booking confirmations and all other emails
+const FROM_EMAIL_RAPPORT = 'Ambition Valley <rapport@ambitionvalley.nl>'
+const FROM_EMAIL_NOTIFICATIONS = 'Ambition Valley <notifications@ambitionvalley.nl>'
 const REPLY_TO_EMAIL = 'info@ambitionvalley.nl'
+
+export type EmailType = 'rapport' | 'notification'
 
 export interface SendEmailParams {
   to: string
@@ -12,6 +18,7 @@ export interface SendEmailParams {
     filename: string
     content: Buffer
   }>
+  type?: EmailType // defaults to 'notification'
 }
 
 export interface SendEmailResult {
@@ -24,12 +31,15 @@ export interface SendEmailResult {
  * Send an email via Resend
  */
 export async function sendEmail(params: SendEmailParams): Promise<SendEmailResult> {
-  const { to, subject, html, attachments } = params
+  const { to, subject, html, attachments, type = 'notification' } = params
+
+  // Select sender based on email type
+  const fromEmail = type === 'rapport' ? FROM_EMAIL_RAPPORT : FROM_EMAIL_NOTIFICATIONS
 
   // Initialize Resend client inside function to ensure env var is loaded
   const apiKey = process.env.RESEND_API_KEY
   console.log('[Resend] API Key present:', !!apiKey, apiKey ? `${apiKey.substring(0, 10)}...` : 'MISSING')
-  console.log('[Resend] FROM_EMAIL:', FROM_EMAIL)
+  console.log('[Resend] FROM_EMAIL:', fromEmail, '(type:', type, ')')
 
   if (!apiKey) {
     return {
@@ -44,7 +54,8 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
     // Log the attempt
     console.log('[Resend] Sending email:', {
       to,
-      from: FROM_EMAIL,
+      from: fromEmail,
+      type,
       subject,
       hasAttachments: !!attachments?.length,
       timestamp: new Date().toISOString(),
@@ -52,7 +63,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
 
     // Send email via Resend
     const { data, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: fromEmail,
       to: [to],
       replyTo: REPLY_TO_EMAIL,
       subject,
@@ -101,9 +112,9 @@ export function isResendConfigured(): boolean {
 /**
  * Get email metadata
  */
-export function getEmailMetadata() {
+export function getEmailMetadata(type: EmailType = 'notification') {
   return {
-    from: FROM_EMAIL,
+    from: type === 'rapport' ? FROM_EMAIL_RAPPORT : FROM_EMAIL_NOTIFICATIONS,
     replyTo: REPLY_TO_EMAIL,
   }
 }

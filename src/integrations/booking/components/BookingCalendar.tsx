@@ -233,18 +233,21 @@ export function BookingCalendar({
       {/* Time Slots */}
       {selectedDate && (
         <div className="border-t border-white/10 p-4">
-          <h3 className="text-sm font-medium text-white/70 mb-3">
-            Beschikbare tijden - {selectedDate.toLocaleDateString('nl-NL', {
+          <h3 className="text-sm font-medium text-white/70 mb-4">
+            Beschikbare tijden
+          </h3>
+          <p className="text-xs text-white/50 mb-4">
+            {selectedDate.toLocaleDateString('nl-NL', {
               weekday: 'long',
               day: 'numeric',
               month: 'long',
             })}
-          </h3>
+          </p>
           {slotsForSelectedDate.length === 0 ? (
             <p className="text-white/50 text-sm">Geen tijden beschikbaar</p>
           ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-              {slotsForSelectedDate.map((slot) => {
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {slotsForSelectedDate.map((slot, index) => {
                 const isSlotSelected =
                   selectedSlot &&
                   slot.start.getTime() === selectedSlot.start.getTime();
@@ -254,18 +257,22 @@ export function BookingCalendar({
                     key={slot.start.toISOString()}
                     onClick={() => onSelectSlot(slot)}
                     className={`
-                      py-2 px-3 text-sm rounded-xl transition-all
+                      relative py-3 px-4 rounded-xl transition-all duration-200 text-center
                       ${isSlotSelected
-                        ? 'bg-white text-[#1062eb] font-semibold'
-                        : 'glass hover:bg-white/20 text-white'
+                        ? 'bg-white text-[#1062eb] font-semibold shadow-lg shadow-white/20 scale-[1.02]'
+                        : 'bg-white/5 hover:bg-white/15 text-white border border-white/10 hover:border-white/30'
                       }
                     `}
+                    style={{ animationDelay: `${index * 30}ms` }}
                   >
-                    {formatTimeSlot(slot)}
+                    <span className="text-base font-medium">{formatTimeSlot(slot)}</span>
                     {slot.remainingSeats !== undefined && slot.remainingSeats > 1 && (
-                      <span className="block text-xs opacity-75">
-                        {slot.remainingSeats} plekken
+                      <span className={`block text-xs mt-1 ${isSlotSelected ? 'text-[#1062eb]/70' : 'text-white/50'}`}>
+                        {slot.remainingSeats} plekken beschikbaar
                       </span>
+                    )}
+                    {isSlotSelected && (
+                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
                     )}
                   </button>
                 );

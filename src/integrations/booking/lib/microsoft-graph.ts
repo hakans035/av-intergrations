@@ -37,9 +37,10 @@ export async function getAccessToken(): Promise<string> {
     return cachedToken.accessToken;
   }
 
-  const clientId = process.env.MS_GRAPH_CLIENT_ID;
-  const clientSecret = process.env.MS_GRAPH_CLIENT_SECRET;
-  const tenantId = process.env.MS_GRAPH_TENANT_ID || 'common';
+  // Support both naming conventions for env vars
+  const clientId = process.env.MICROSOFT_CLIENT_ID || process.env.MS_GRAPH_CLIENT_ID;
+  const clientSecret = process.env.MICROSOFT_CLIENT_SECRET || process.env.MS_GRAPH_CLIENT_SECRET;
+  const tenantId = process.env.MICROSOFT_TENANT_ID || process.env.MS_GRAPH_TENANT_ID || 'common';
 
   if (!clientId || !clientSecret) {
     throw new Error('Microsoft Graph credentials not configured');
@@ -118,7 +119,7 @@ export async function getAvailability(
   timezone: string = 'Europe/Amsterdam'
 ): Promise<OutlookFreeBusy[]> {
   const accessToken = await getAccessToken();
-  const email = userEmail || process.env.MS_GRAPH_USER_EMAIL;
+  const email = userEmail || process.env.MICROSOFT_USER_EMAIL || process.env.MS_GRAPH_USER_EMAIL;
 
   if (!email) {
     throw new Error('User email not configured for calendar availability');
@@ -225,6 +226,8 @@ interface GraphCalendarEvent {
   }>;
   isOnlineMeeting?: boolean;
   onlineMeetingProvider?: string;
+  // Prevent automatic invite emails - we send our own booking confirmation
+  isReminderOn?: boolean;
 }
 
 /**
@@ -237,6 +240,37 @@ export async function createCalendarEvent(
   createTeamsMeeting: boolean = false
 ): Promise<CalendarEvent> {
   const accessToken = await getAccessToken();
+  const userEmail = process.env.MICROSOFT_USER_EMAIL || process.env.MS_GRAPH_USER_EMAIL;
+
+  if (!userEmail) {
+    throw new Error('User email not configured for calendar events');
+  }
+
+  // Microsoft Graph expects dateTime without 'Z' suffix when timeZone is specified
+  // Convert ISO strings to local datetime format
+  const formatDateTimeForGraph = (isoString: string): string => {
+    // Remove the 'Z' or timezone offset from ISO string
+    return isoString.replace('Z', '').replace(/[+-]\d{2}:\d{2}$/, '');
+  };
+
+  // Get secondary user email for shared calendar
+  const secondaryUserEmail = process.env.MICROSOFT_USER_EMAIL_SECONDARY;
+
+  // Build attendees list - include secondary user (Ramin) as required attendee
+  // The primary user (Hakan) is the organizer, so he automatically gets the event
+  // We DON'T include the customer as attendee to prevent automatic Microsoft invite emails
+  const attendees: GraphCalendarEvent['attendees'] = [];
+
+  // Add secondary team member as required attendee
+  if (secondaryUserEmail) {
+    attendees.push({
+      emailAddress: {
+        address: secondaryUserEmail,
+        name: secondaryUserEmail.split('@')[0].charAt(0).toUpperCase() + secondaryUserEmail.split('@')[0].slice(1),
+      },
+      type: 'required',
+    });
+  }
 
   const eventBody: GraphCalendarEvent = {
     subject: `${eventType.title} - ${booking.customer_name}`,
@@ -251,22 +285,18 @@ export async function createCalendarEvent(
       `,
     },
     start: {
-      dateTime: booking.start_time,
-      timeZone: booking.timezone,
+      dateTime: formatDateTimeForGraph(booking.start_time),
+      timeZone: booking.timezone || 'Europe/Amsterdam',
     },
     end: {
-      dateTime: booking.end_time,
-      timeZone: booking.timezone,
+      dateTime: formatDateTimeForGraph(booking.end_time),
+      timeZone: booking.timezone || 'Europe/Amsterdam',
     },
-    attendees: [
-      {
-        emailAddress: {
-          address: booking.customer_email,
-          name: booking.customer_name,
-        },
-        type: 'required',
-      },
-    ],
+    // Include team members as attendees - they will receive calendar invites
+    // Customer is NOT included - we send our own booking confirmation email
+    attendees,
+    // Enable reminder for organizers (15 minutes before by default)
+    isReminderOn: true,
   };
 
   // Add location if on-site
@@ -282,7 +312,9 @@ export async function createCalendarEvent(
     eventBody.onlineMeetingProvider = 'teamsForBusiness';
   }
 
-  const response = await fetch(`${GRAPH_API_BASE}/me/events`, {
+  // Use /users/{email}/events for application permissions (client credentials flow)
+  // /me/events only works with delegated permissions (user signed in)
+  const response = await fetch(`${GRAPH_API_BASE}/users/${userEmail}/events`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -293,6 +325,7 @@ export async function createCalendarEvent(
 
   if (!response.ok) {
     const error = await response.text();
+    console.error('[MSGraph] Failed to create calendar event:', error);
     throw new Error(`Failed to create calendar event: ${error}`);
   }
 
@@ -322,6 +355,11 @@ export async function updateCalendarEvent(
   }>
 ): Promise<CalendarEvent> {
   const accessToken = await getAccessToken();
+  const userEmail = process.env.MICROSOFT_USER_EMAIL || process.env.MS_GRAPH_USER_EMAIL;
+
+  if (!userEmail) {
+    throw new Error('User email not configured for calendar events');
+  }
 
   const eventBody: Partial<GraphCalendarEvent> = {};
 
@@ -343,7 +381,7 @@ export async function updateCalendarEvent(
     };
   }
 
-  const response = await fetch(`${GRAPH_API_BASE}/me/events/${eventId}`, {
+  const response = await fetch(`${GRAPH_API_BASE}/users/${userEmail}/events/${eventId}`, {
     method: 'PATCH',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -375,8 +413,13 @@ export async function updateCalendarEvent(
  */
 export async function cancelCalendarEvent(eventId: string): Promise<void> {
   const accessToken = await getAccessToken();
+  const userEmail = process.env.MICROSOFT_USER_EMAIL || process.env.MS_GRAPH_USER_EMAIL;
 
-  const response = await fetch(`${GRAPH_API_BASE}/me/events/${eventId}`, {
+  if (!userEmail) {
+    throw new Error('User email not configured for calendar events');
+  }
+
+  const response = await fetch(`${GRAPH_API_BASE}/users/${userEmail}/events/${eventId}`, {
     method: 'DELETE',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -416,6 +459,11 @@ export async function createTeamsMeeting(
   eventType: EventType
 ): Promise<TeamsOnlineMeeting> {
   const accessToken = await getAccessToken();
+  const userEmail = process.env.MICROSOFT_USER_EMAIL || process.env.MS_GRAPH_USER_EMAIL;
+
+  if (!userEmail) {
+    throw new Error('User email not configured for Teams meetings');
+  }
 
   const meetingRequest: OnlineMeetingRequest = {
     subject: `${eventType.title} - ${booking.customer_name}`,
@@ -433,7 +481,7 @@ export async function createTeamsMeeting(
     },
   };
 
-  const response = await fetch(`${GRAPH_API_BASE}/me/onlineMeetings`, {
+  const response = await fetch(`${GRAPH_API_BASE}/users/${userEmail}/onlineMeetings`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -463,8 +511,13 @@ export async function createTeamsMeeting(
  */
 export async function getTeamsMeeting(meetingId: string): Promise<TeamsOnlineMeeting | null> {
   const accessToken = await getAccessToken();
+  const userEmail = process.env.MICROSOFT_USER_EMAIL || process.env.MS_GRAPH_USER_EMAIL;
 
-  const response = await fetch(`${GRAPH_API_BASE}/me/onlineMeetings/${meetingId}`, {
+  if (!userEmail) {
+    throw new Error('User email not configured for Teams meetings');
+  }
+
+  const response = await fetch(`${GRAPH_API_BASE}/users/${userEmail}/onlineMeetings/${meetingId}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -526,6 +579,11 @@ export async function getUpcomingEvents(
   endDate: Date
 ): Promise<CalendarEvent[]> {
   const accessToken = await getAccessToken();
+  const userEmail = process.env.MICROSOFT_USER_EMAIL || process.env.MS_GRAPH_USER_EMAIL;
+
+  if (!userEmail) {
+    throw new Error('User email not configured for calendar events');
+  }
 
   const params = new URLSearchParams({
     startDateTime: startDate.toISOString(),
@@ -534,7 +592,7 @@ export async function getUpcomingEvents(
     $orderby: 'start/dateTime',
   });
 
-  const response = await fetch(`${GRAPH_API_BASE}/me/calendarView?${params}`, {
+  const response = await fetch(`${GRAPH_API_BASE}/users/${userEmail}/calendarView?${params}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${accessToken}`,

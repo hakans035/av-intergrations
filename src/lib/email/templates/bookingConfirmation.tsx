@@ -10,11 +10,9 @@ export interface BookingConfirmationEmailProps {
   locationType: 'online' | 'on_location' | 'hybrid';
   locationAddress?: string;
   meetingUrl?: string;
-  totalPrice: string;
-  depositPaid: string;
-  remainingBalance?: string;
   bookingId: string;
   cancellationUrl: string;
+  showInvoiceNotice?: boolean;
 }
 
 export const getBookingConfirmationSubject = (eventTitle: string): string => {
@@ -30,10 +28,8 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
   locationType,
   locationAddress,
   meetingUrl,
-  totalPrice,
-  depositPaid,
-  remainingBalance,
   cancellationUrl,
+  showInvoiceNotice = false,
 }) => {
   const displayName = customerName || 'Beste';
   const isOnline = locationType === 'online' || locationType === 'hybrid';
@@ -95,20 +91,28 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
                         <table role="presentation" cellPadding={0} cellSpacing={0}>
                           <tbody>
                             <tr>
-                              <td style={{ paddingRight: '12px' }}>
-                                <div style={{
-                                  width: '24px',
-                                  height: '24px',
+                              <td valign="middle" style={{ paddingRight: '12px' }}>
+                                <table role="presentation" cellPadding={0} cellSpacing={0} style={{
+                                  width: '28px',
+                                  height: '28px',
                                   backgroundColor: '#ffffff',
                                   borderRadius: '50%',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
                                 }}>
-                                  <span style={{ color: '#10b981', fontSize: '16px' }}>✓</span>
-                                </div>
+                                  <tbody>
+                                    <tr>
+                                      <td align="center" valign="middle" style={{
+                                        color: '#10b981',
+                                        fontSize: '18px',
+                                        fontWeight: 'bold',
+                                        lineHeight: '28px',
+                                      }}>
+                                        ✓
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
                               </td>
-                              <td>
+                              <td valign="middle">
                                 <span style={{ color: '#ffffff', fontSize: '16px', fontWeight: 'bold' }}>
                                   Boeking Bevestigd
                                 </span>
@@ -226,43 +230,26 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
                           </table>
                         )}
 
-                        {/* Payment Summary */}
-                        {totalPrice !== '€0,00' && (
+                        {/* Invoice Notice - Only for paid trajecten */}
+                        {showInvoiceNotice && (
                           <table
                             role="presentation"
                             cellPadding={0}
                             cellSpacing={0}
                             width="100%"
                             style={{
-                              backgroundColor: '#f8fafc',
-                              borderRadius: '8px',
+                              backgroundColor: '#fefce8',
+                              borderLeft: '4px solid #eab308',
+                              borderRadius: '0 8px 8px 0',
                               marginBottom: '24px',
                             }}
                           >
                             <tbody>
                               <tr>
-                                <td style={{ padding: '20px' }}>
-                                  <h4 style={{ fontSize: '13px', fontWeight: 'bold', color: '#1e344b', margin: '0 0 12px 0', textTransform: 'uppercase' }}>
-                                    Betaling
-                                  </h4>
-                                  <table role="presentation" cellPadding={0} cellSpacing={0} width="100%">
-                                    <tbody>
-                                      <tr>
-                                        <td style={{ fontSize: '14px', color: '#64748b', padding: '4px 0' }}>Totaal:</td>
-                                        <td style={{ fontSize: '14px', color: '#1e344b', fontWeight: 'bold', textAlign: 'right' }}>{totalPrice}</td>
-                                      </tr>
-                                      <tr>
-                                        <td style={{ fontSize: '14px', color: '#10b981', padding: '4px 0' }}>Betaald:</td>
-                                        <td style={{ fontSize: '14px', color: '#10b981', fontWeight: 'bold', textAlign: 'right' }}>{depositPaid}</td>
-                                      </tr>
-                                      {remainingBalance && (
-                                        <tr>
-                                          <td style={{ fontSize: '14px', color: '#64748b', padding: '4px 0' }}>Nog te betalen:</td>
-                                          <td style={{ fontSize: '14px', color: '#1e344b', fontWeight: 'bold', textAlign: 'right' }}>{remainingBalance}</td>
-                                        </tr>
-                                      )}
-                                    </tbody>
-                                  </table>
+                                <td style={{ padding: '16px 20px' }}>
+                                  <p style={{ fontSize: '14px', color: '#854d0e', margin: 0, lineHeight: '1.6' }}>
+                                    <strong>Factuur:</strong> U ontvangt de factuur separaat per e-mail van een van onze collega's.
+                                  </p>
                                 </td>
                               </tr>
                             </tbody>

@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { z } from 'zod';
-import { createRefund } from '@/integrations/booking/lib/stripe';
 import { cancelCalendarEvent } from '@/integrations/booking/lib/microsoft-graph';
 import { sendBookingEmails } from '@/lib/email/workflows';
 
 const cancelBookingSchema = z.object({
   bookingId: z.string().uuid(),
   reason: z.string().optional(),
-  refund: z.boolean().default(true),
 });
 
 // POST: Cancel a booking
@@ -24,7 +22,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { bookingId, reason, refund } = validation.data;
+    const { bookingId, reason } = validation.data;
     const supabase = createServiceClient();
 
     // Get the booking
@@ -59,24 +57,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // Process refund if applicable
-    let refundResult = null;
-    if (
-      refund &&
-      booking.stripe_payment_intent_id &&
-      (booking.payment_status === 'deposit_paid' || booking.payment_status === 'fully_paid')
-    ) {
-      try {
-        refundResult = await createRefund({
-          paymentIntentId: booking.stripe_payment_intent_id,
-          reason: 'requested_by_customer',
-        });
-      } catch (refundError) {
-        console.error('[API] Failed to process refund:', refundError);
-        // Continue with cancellation, but note refund failed
-      }
-    }
-
     // Update booking status
     const { data: updatedBooking, error: updateError } = await supabase
       .from('bookings')
@@ -84,7 +64,6 @@ export async function POST(request: Request) {
         status: 'cancelled',
         cancellation_reason: reason || null,
         cancelled_at: new Date().toISOString(),
-        payment_status: refundResult ? 'refunded' : booking.payment_status,
       })
       .eq('id', bookingId)
       .select()
@@ -108,8 +87,6 @@ export async function POST(request: Request) {
       success: true,
       data: {
         booking: updatedBooking,
-        refunded: !!refundResult,
-        refundAmount: refundResult?.amount,
       },
     });
   } catch (error) {

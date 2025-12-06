@@ -4,13 +4,18 @@ import { useState } from 'react';
 import { User, Mail, Phone, FileText, Users, Plus, X, Loader2 } from 'lucide-react';
 import type { TimeSlot, EventType, CreateBookingRequest } from '../types';
 import { formatTimeSlot, formatDate } from '../lib/availability';
-import { getPriceBreakdown } from '../lib/stripe';
 
 interface BookingFormProps {
   eventType: EventType;
   selectedSlot: TimeSlot;
   onSubmit: (data: CreateBookingRequest) => Promise<void>;
   isLoading?: boolean;
+  initialValues?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    notes?: string;
+  };
 }
 
 interface Attendee {
@@ -23,16 +28,16 @@ export function BookingForm({
   selectedSlot,
   onSubmit,
   isLoading = false,
+  initialValues,
 }: BookingFormProps) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [notes, setNotes] = useState('');
+  const [name, setName] = useState(initialValues?.name || '');
+  const [email, setEmail] = useState(initialValues?.email || '');
+  const [phone, setPhone] = useState(initialValues?.phone || '');
+  const [notes, setNotes] = useState(initialValues?.notes || '');
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const isGroupEvent = eventType.max_attendees > 1;
-  const priceBreakdown = getPriceBreakdown(eventType);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -267,31 +272,6 @@ export function BookingForm({
         </div>
       )}
 
-      {/* Price Summary */}
-      {!priceBreakdown.isFree && (
-        <div className="glass rounded-2xl p-4 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-          <h4 className="text-sm font-medium text-white/80 mb-2">Kosten</h4>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-white/60">Totaal</span>
-              <span className="font-medium text-white">{priceBreakdown.total}</span>
-            </div>
-            {priceBreakdown.depositPercent < 100 && (
-              <>
-                <div className="flex justify-between text-green-300">
-                  <span>Nu te betalen ({priceBreakdown.depositPercent}%)</span>
-                  <span className="font-medium">{priceBreakdown.deposit}</span>
-                </div>
-                <div className="flex justify-between text-white/50">
-                  <span>Later te betalen</span>
-                  <span>{priceBreakdown.remaining}</span>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Submit Button */}
       <button
         type="submit"
@@ -310,10 +290,8 @@ export function BookingForm({
             <Loader2 className="w-5 h-5 animate-spin" />
             Bezig met verwerken...
           </span>
-        ) : priceBreakdown.isFree ? (
-          'Boeken'
         ) : (
-          `Betalen (${priceBreakdown.deposit})`
+          'Boeken'
         )}
       </button>
 

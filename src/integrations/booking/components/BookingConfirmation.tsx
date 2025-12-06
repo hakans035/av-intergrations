@@ -3,7 +3,6 @@
 import { CheckCircle, Calendar, Clock, MapPin, Video, Mail, ExternalLink } from 'lucide-react';
 import type { Booking, EventType } from '../types';
 import { formatDate, formatTimeSlot } from '../lib/availability';
-import { formatPrice } from '../lib/stripe';
 
 interface BookingConfirmationProps {
   booking: Booking;
@@ -115,28 +114,6 @@ export function BookingConfirmation({
             </div>
           </div>
 
-          {booking.total_price_cents > 0 && (
-            <div className="pt-4 border-t border-white/10">
-              <div className="flex justify-between text-sm">
-                <span className="text-white/60">Totaal betaald</span>
-                <span className="font-medium text-white">
-                  {formatPrice(
-                    booking.payment_status === 'deposit_paid'
-                      ? booking.deposit_cents
-                      : booking.total_price_cents
-                  )}
-                </span>
-              </div>
-              {booking.payment_status === 'deposit_paid' && (
-                <div className="flex justify-between text-sm mt-1">
-                  <span className="text-white/60">Nog te betalen</span>
-                  <span className="text-white/80">
-                    {formatPrice(booking.total_price_cents - booking.deposit_cents)}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
 

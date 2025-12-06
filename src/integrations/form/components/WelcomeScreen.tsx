@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Clock, Check } from 'lucide-react';
+import { ArrowRight, Clock, Check, Euro } from 'lucide-react';
 import { WelcomeScreen as WelcomeScreenType } from '../types';
 
 interface WelcomeScreenProps {
@@ -16,12 +16,15 @@ export function WelcomeScreenComponent({ screen, onStart }: WelcomeScreenProps) 
         <span className="gradient-text">{screen.title}</span>
       </h1>
 
-      {/* Description */}
-      {screen.properties.description && (
-        <p className="animate-fade-in-up opacity-0 animation-delay-100 text-base sm:text-lg md:text-xl text-blue-100/70 font-light mb-10 max-w-xl leading-relaxed">
-          {screen.properties.description}
-        </p>
-      )}
+      {/* Savings highlight - wow effect */}
+      <div className="animate-fade-in-up opacity-0 animation-delay-100 mb-8">
+        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-green-500/15 border border-green-400/40">
+          <Euro className="w-6 h-6 text-green-300" />
+          <span className="text-lg sm:text-xl font-semibold text-white">
+            Bespaar <span className="text-green-300">€3.000 - €15.000</span> per jaar
+          </span>
+        </div>
+      </div>
 
       {/* Trust indicators - professional badges */}
       <div className="animate-fade-in-up opacity-0 animation-delay-200 flex flex-wrap justify-center gap-4 sm:gap-6 mb-10">
@@ -29,7 +32,7 @@ export function WelcomeScreenComponent({ screen, onStart }: WelcomeScreenProps) 
           <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
             <Clock className="w-4 h-4 text-green-400" />
           </div>
-          <span className="text-sm font-medium">2 minuten</span>
+          <span className="text-sm font-medium">Slechts 2 minuten</span>
         </div>
         <div className="flex items-center gap-2 text-white/80">
           <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">

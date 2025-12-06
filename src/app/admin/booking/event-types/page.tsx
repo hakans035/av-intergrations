@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Plus, ArrowLeft, Clock, Euro, Users, Video, MapPin } from 'lucide-react';
-import { formatPrice } from '@/integrations/booking/lib/stripe';
+import { formatPrice } from '@/lib/utils/format';
 
 async function getEventTypes() {
   const supabase = createServiceClient();

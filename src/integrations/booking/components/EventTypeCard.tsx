@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Clock, MapPin, Users, Video, Euro } from 'lucide-react';
 import type { EventType } from '../types';
-import { formatPrice } from '../lib/stripe';
+import { formatPrice } from '@/lib/utils/format';
 
 interface EventTypeCardProps {
   eventType: EventType;

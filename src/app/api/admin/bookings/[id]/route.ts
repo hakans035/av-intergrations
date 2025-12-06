@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { z } from 'zod';
-import { createRefund } from '@/integrations/booking/lib/stripe';
 import { cancelCalendarEvent, createBookingWithMeeting } from '@/integrations/booking/lib/microsoft-graph';
 import type { EventType, Booking } from '@/integrations/booking/types';
 
@@ -14,7 +13,6 @@ const updateBookingSchema = z.object({
   status: z.enum(['pending', 'confirmed', 'cancelled', 'completed', 'no_show']).optional(),
   cancellation_reason: z.string().optional(),
   customer_notes: z.string().optional(),
-  refund: z.boolean().optional(),
 });
 
 // Check admin authorization
@@ -90,7 +88,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
       );
     }
 
-    const { status, cancellation_reason, customer_notes, refund } = validation.data;
+    const { status, cancellation_reason, customer_notes } = validation.data;
     const supabase = createServiceClient();
 
     // Get current booking
@@ -127,19 +125,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
             await cancelCalendarEvent(currentBooking.meeting_id);
           } catch (calendarError) {
             console.error('[Admin API] Failed to cancel calendar event:', calendarError);
-          }
-        }
-
-        // Process refund if requested
-        if (refund && currentBooking.stripe_payment_intent_id) {
-          try {
-            await createRefund({
-              paymentIntentId: currentBooking.stripe_payment_intent_id,
-              reason: 'requested_by_customer',
-            });
-            updates.payment_status = 'refunded';
-          } catch (refundError) {
-            console.error('[Admin API] Failed to process refund:', refundError);
           }
         }
       }

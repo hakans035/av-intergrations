@@ -301,7 +301,7 @@ export async function POST(
       getEmailSubject(body.calculator)
     )
 
-    // Send email via Resend
+    // Send email via Resend (using 'rapport' sender for calculator reports)
     console.log(`[${requestId}] Step 11: Sending email via Resend...`)
     const emailResult = await sendEmail({
       to: body.email,
@@ -313,6 +313,7 @@ export async function POST(
           content: pdfBuffer,
         },
       ],
+      type: 'rapport', // Use rapport@ambitionvalley.nl for calculator reports
     })
 
     if (!emailResult.success) {

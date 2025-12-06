@@ -4,7 +4,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { StatsCard } from '@/components/admin/StatsCard';
 import { Calendar, Clock, Users, Euro, Plus, Settings } from 'lucide-react';
-import { formatPrice } from '@/integrations/booking/lib/stripe';
+import { formatPrice } from '@/lib/utils/format';
 
 async function getBookingStats() {
   const supabase = createServiceClient();

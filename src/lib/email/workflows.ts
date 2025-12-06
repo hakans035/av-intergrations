@@ -9,6 +9,7 @@ import {
 } from './index';
 import { BookingReminderEmail, getBookingReminderSubject } from './templates/bookingReminder';
 import { IntakeFollowUpEmail, getIntakeFollowUpSubject } from './templates/intakeFollowUp';
+import { generateICSBuffer, type ICSEventParams } from './ics';
 
 // Types
 export interface EmailWorkflow {
@@ -173,7 +174,7 @@ function getDaysUntil(startTime: string): number {
 async function renderTemplate(
   templateType: TemplateType,
   booking: BookingWithEventType
-): Promise<{ html: string; subject: string } | null> {
+): Promise<{ html: string; subject: string; attachments?: Array<{ filename: string; content: Buffer }> } | null> {
   // Dynamic import to avoid build issues with react-dom/server
   const { renderToStaticMarkup } = await import('react-dom/server');
 
@@ -186,6 +187,9 @@ async function renderTemplate(
 
   switch (templateType) {
     case 'booking_confirmation': {
+      // Show invoice notice only for paid bookings (trajecten)
+      const showInvoiceNotice = booking.total_price_cents > 0;
+
       const props = {
         customerName: booking.customer_name,
         eventTitle: booking.event_types.title,
@@ -195,16 +199,33 @@ async function renderTemplate(
         locationType: booking.event_types.location_type as 'online' | 'on_location' | 'hybrid',
         locationAddress: booking.event_types.location_address || undefined,
         meetingUrl: booking.meeting_url || undefined,
-        totalPrice: formatPrice(booking.total_price_cents),
-        depositPaid: formatPrice(booking.deposit_cents || booking.total_price_cents),
-        remainingBalance: booking.deposit_cents && booking.deposit_cents < booking.total_price_cents
-          ? formatPrice(booking.total_price_cents - booking.deposit_cents)
-          : undefined,
         bookingId: booking.id,
         cancellationUrl,
+        showInvoiceNotice,
       };
       const html = `<!DOCTYPE html>${renderToStaticMarkup(React.createElement(BookingConfirmationEmail, props))}`;
-      return { html, subject: getBookingConfirmationSubject(booking.event_types.title) };
+
+      // Generate ICS calendar file attachment
+      const icsParams: ICSEventParams = {
+        uid: booking.id,
+        title: `${booking.event_types.title} - Ambition Valley`,
+        description: booking.event_types.description || `Afspraak met Ambition Valley: ${booking.event_types.title}`,
+        startTime: booking.start_time,
+        endTime: booking.end_time,
+        location: booking.event_types.location_address || undefined,
+        meetingUrl: booking.meeting_url || undefined,
+        organizerName: 'Ambition Valley',
+        organizerEmail: 'info@ambitionvalley.nl',
+        attendeeName: booking.customer_name,
+        attendeeEmail: booking.customer_email,
+      };
+      const icsBuffer = generateICSBuffer(icsParams);
+
+      return {
+        html,
+        subject: getBookingConfirmationSubject(booking.event_types.title),
+        attachments: [{ filename: 'invite.ics', content: icsBuffer }],
+      };
     }
 
     case 'booking_cancellation': {
@@ -213,8 +234,6 @@ async function renderTemplate(
         eventTitle: booking.event_types.title,
         eventDate,
         eventTime,
-        refunded: booking.payment_status === 'refunded',
-        refundAmount: formatPrice(booking.deposit_cents || booking.total_price_cents),
       };
       const html = `<!DOCTYPE html>${renderToStaticMarkup(React.createElement(BookingCancellationEmail, props))}`;
       return { html, subject: getBookingCancellationSubject() };
@@ -298,11 +317,12 @@ export async function triggerWorkflowEmails(
       // Use workflow subject or template default
       const subject = workflow.email_subject || rendered.subject;
 
-      // Send email
+      // Send email with optional attachments (e.g., ICS calendar file)
       const result = await sendEmail({
         to: booking.customer_email,
         subject,
         html: rendered.html,
+        attachments: rendered.attachments,
       });
 
       if (result.success) {

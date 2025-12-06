@@ -22,7 +22,13 @@ export default function BookingSlugPage({ params }: { params: Promise<PageParams
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const cancelled = searchParams.get('cancelled') === 'true';
+  // Get pre-filled user data from URL params (from form submission)
+  const initialFormValues = {
+    name: searchParams.get('name') || undefined,
+    email: searchParams.get('email') || undefined,
+    phone: searchParams.get('phone') || undefined,
+    notes: searchParams.get('notes') || undefined,
+  };
 
   // Resolve params
   useEffect(() => {
@@ -75,13 +81,7 @@ export default function BookingSlugPage({ params }: { params: Promise<PageParams
         return;
       }
 
-      // If payment required, redirect to Stripe
-      if (data.data.requiresPayment && data.data.checkoutUrl) {
-        window.location.href = data.data.checkoutUrl;
-        return;
-      }
-
-      // Otherwise, redirect to confirmation page
+      // Redirect to confirmation page
       router.push(`/booking/${slug}/confirm?booking_id=${data.data.booking.id}`);
     } catch {
       setError('Er is een fout opgetreden bij het maken van de boeking');
@@ -214,15 +214,6 @@ export default function BookingSlugPage({ params }: { params: Promise<PageParams
           )}
         </div>
 
-        {/* Cancelled Message */}
-        {cancelled && (
-          <div className="mb-6 glass rounded-2xl p-4 border border-yellow-400/30 animate-fade-in-up">
-            <p className="text-yellow-300">
-              De betaling is geannuleerd. U kunt opnieuw een tijd kiezen om te boeken.
-            </p>
-          </div>
-        )}
-
         {/* Error Message */}
         {error && (
           <div className="mb-6 glass rounded-2xl p-4 border border-red-400/30 animate-fade-in-up">
@@ -255,6 +246,7 @@ export default function BookingSlugPage({ params }: { params: Promise<PageParams
                   selectedSlot={selectedSlot}
                   onSubmit={handleSubmit}
                   isLoading={submitting}
+                  initialValues={initialFormValues}
                 />
               </>
             ) : (

@@ -19,7 +19,6 @@ export const ambitionValleyForm: FormDefinition = {
       properties: {
         show_button: true,
         button_text: 'Start de gratis check',
-        description: 'Duurt slechts 2 minuten.',
       },
     },
   ],
@@ -31,7 +30,7 @@ export const ambitionValleyForm: FormDefinition = {
       type: 'url_redirect',
       properties: {
         redirect_url:
-          '/booking?name={{field:e4c76d43-32ad-4524-b1c2-006908648e60}}&email={{field:a24de67e-afa1-440f-8bb5-3ca5e82902ad}}&phone={{field:6f2eaa42-cd82-49b5-9c06-ad8d940023f7}}',
+          '/booking?name={{field:e4c76d43-32ad-4524-b1c2-006908648e60}}&email={{field:a24de67e-afa1-440f-8bb5-3ca5e82902ad}}&phone={{field:6f2eaa42-cd82-49b5-9c06-ad8d940023f7}}&notes={{field:6a6fd8a9-bd6a-4b89-ba43-b0d137ec8db4}}',
       },
     },
     {
