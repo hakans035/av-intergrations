@@ -72,6 +72,10 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
         filename: att.filename,
         content: att.content,
       })),
+      headers: {
+        'List-Unsubscribe': `<mailto:unsubscribe@ambitionvalley.nl?subject=Unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+      },
     })
 
     if (error) {
