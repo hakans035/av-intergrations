@@ -43,12 +43,14 @@ ${colors.cyan}╔═════════════════════
   const clientSecret = process.env.MICROSOFT_CLIENT_SECRET || process.env.MS_GRAPH_CLIENT_SECRET;
   const tenantId = process.env.MICROSOFT_TENANT_ID || process.env.MS_GRAPH_TENANT_ID;
   const userEmail = process.env.MICROSOFT_USER_EMAIL || process.env.MS_GRAPH_USER_EMAIL;
+  const secondaryEmail = process.env.MICROSOFT_USER_EMAIL_SECONDARY;
 
   console.log(`${colors.cyan}Environment Variables:${colors.reset}`);
   log(`Client ID: ${clientId ? clientId.substring(0, 8) + '...' : 'NOT SET'}`, clientId ? 'success' : 'error');
   log(`Client Secret: ${clientSecret ? '***' + clientSecret.slice(-4) : 'NOT SET'}`, clientSecret ? 'success' : 'error');
   log(`Tenant ID: ${tenantId || 'NOT SET'}`, tenantId ? 'success' : 'error');
-  log(`User Email: ${userEmail || 'NOT SET'}`, userEmail ? 'success' : 'error');
+  log(`User Email (Primary): ${userEmail || 'NOT SET'}`, userEmail ? 'success' : 'error');
+  log(`User Email (Secondary): ${secondaryEmail || 'NOT SET'}`, secondaryEmail ? 'success' : 'warn');
   console.log('');
 
   if (!clientId || !clientSecret || !tenantId || !userEmail) {
@@ -142,6 +144,72 @@ ${colors.yellow}Possible fixes:${colors.reset}
 
     const calendarData = await calendarResponse.json();
     log(`Calendar access OK: ${calendarData.name}`, 'success');
+    console.log('');
+
+    // Step 3b: Test Secondary Calendar Access (if configured)
+    if (secondaryEmail) {
+      console.log(`${colors.cyan}Step 3b: Test Secondary Calendar Access (${secondaryEmail})${colors.reset}`);
+
+      const secondaryCalendarResponse = await fetch(`${GRAPH_API_BASE}/users/${secondaryEmail}/calendar`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!secondaryCalendarResponse.ok) {
+        const errorText = await secondaryCalendarResponse.text();
+        log(`Failed to access secondary calendar: ${secondaryCalendarResponse.status}`, 'error');
+        console.log(`${colors.red}Error: ${errorText}${colors.reset}`);
+      } else {
+        const secondaryCalendarData = await secondaryCalendarResponse.json();
+        log(`Secondary calendar access OK: ${secondaryCalendarData.name}`, 'success');
+      }
+      console.log('');
+    }
+
+    // Step 3c: Test Combined Availability Check
+    console.log(`${colors.cyan}Step 3c: Test Combined Availability Check${colors.reset}`);
+
+    const schedules = [userEmail];
+    if (secondaryEmail) schedules.push(secondaryEmail);
+
+    const startTime = new Date();
+    const endTime = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    const availabilityBody = {
+      schedules: schedules,
+      startTime: {
+        dateTime: startTime.toISOString(),
+        timeZone: 'Europe/Amsterdam',
+      },
+      endTime: {
+        dateTime: endTime.toISOString(),
+        timeZone: 'Europe/Amsterdam',
+      },
+      availabilityViewInterval: 15,
+    };
+
+    // Use /users/{user}/calendar/getSchedule for application credentials
+    const availabilityResponse = await fetch(`${GRAPH_API_BASE}/users/${userEmail}/calendar/getSchedule`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(availabilityBody),
+    });
+
+    if (!availabilityResponse.ok) {
+      const errorText = await availabilityResponse.text();
+      log(`Failed to get availability: ${availabilityResponse.status}`, 'error');
+      console.log(`${colors.red}Error: ${errorText}${colors.reset}`);
+    } else {
+      const availabilityData = await availabilityResponse.json();
+      log(`Checking ${schedules.length} calendar(s) for availability`, 'success');
+
+      for (const schedule of availabilityData.value) {
+        const busyCount = schedule.scheduleItems?.length || 0;
+        log(`  ${schedule.scheduleId}: ${busyCount} busy slot(s) found`, 'info');
+      }
+    }
     console.log('');
 
     // Step 4: Test Creating a Calendar Event

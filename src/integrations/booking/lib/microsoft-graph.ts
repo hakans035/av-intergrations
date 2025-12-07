@@ -109,8 +109,9 @@ interface FreeBusyResponse {
 }
 
 /**
- * Get calendar availability for a user
+ * Get calendar availability for users
  * Returns busy time slots within the specified date range
+ * Checks both primary and secondary calendars if configured
  */
 export async function getAvailability(
   startDate: Date,
@@ -119,14 +120,22 @@ export async function getAvailability(
   timezone: string = 'Europe/Amsterdam'
 ): Promise<OutlookFreeBusy[]> {
   const accessToken = await getAccessToken();
-  const email = userEmail || process.env.MICROSOFT_USER_EMAIL || process.env.MS_GRAPH_USER_EMAIL;
+  const primaryEmail = userEmail || process.env.MICROSOFT_USER_EMAIL || process.env.MS_GRAPH_USER_EMAIL;
+  const secondaryEmail = process.env.MICROSOFT_USER_EMAIL_SECONDARY;
 
-  if (!email) {
+  if (!primaryEmail) {
     throw new Error('User email not configured for calendar availability');
   }
 
+  // Build list of schedules to check (primary + secondary if configured)
+  const schedulesToCheck = [primaryEmail];
+  if (secondaryEmail && !userEmail) {
+    // Only add secondary if no specific userEmail was requested
+    schedulesToCheck.push(secondaryEmail);
+  }
+
   const requestBody: FreeBusyRequest = {
-    schedules: [email],
+    schedules: schedulesToCheck,
     startTime: {
       dateTime: startDate.toISOString(),
       timeZone: timezone,
@@ -138,7 +147,9 @@ export async function getAvailability(
     availabilityViewInterval: 15, // 15-minute intervals
   };
 
-  const response = await fetch(`${GRAPH_API_BASE}/me/calendar/getSchedule`, {
+  // Use /users/{user}/calendar/getSchedule for application credentials
+  // /me/calendar/getSchedule only works with delegated (user login) authentication
+  const response = await fetch(`${GRAPH_API_BASE}/users/${primaryEmail}/calendar/getSchedule`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,

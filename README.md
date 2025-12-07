@@ -1,36 +1,196 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ambition Valley Integrations
 
-## Getting Started
+A Next.js 16 application for Ambition Valley that provides:
+- **Booking System** - Cal.com-style appointment scheduling with Outlook calendar sync
+- **Financial Calculators** - Interactive calculators with PDF report generation
+- **Form System** - Typeform-compatible forms with conditional logic
 
-First, run the development server:
+## Architecture Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+src/
+├── app/                    # Next.js App Router pages & API routes
+│   ├── api/
+│   │   ├── booking/        # Booking API endpoints
+│   │   └── admin/          # Admin API endpoints
+│   ├── booking/            # Public booking pages
+│   └── admin/              # Admin dashboard
+├── integrations/
+│   ├── booking/            # Booking system
+│   │   ├── components/     # Calendar, forms
+│   │   ├── lib/            # Availability, Microsoft Graph
+│   │   └── types.ts        # TypeScript types
+│   ├── calculators/        # Financial calculators
+│   └── form/               # Form system
+└── lib/
+    ├── supabase/           # Database client
+    └── email/              # Resend email templates
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Booking System
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### How It Works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Event Types** - Define appointment types (duration, price, location, availability)
+2. **Availability Schedules** - Set recurring weekly availability (Mon-Fri, 9-17)
+3. **Calendar Integration** - Syncs with Outlook calendars to prevent double-booking
+4. **Booking Flow** - Customer selects date/time → fills form → receives confirmation
 
-## Learn More
+### Outlook Calendar Sync
 
-To learn more about Next.js, take a look at the following resources:
+The booking system checks **both** Hakan's and Ramin's Outlook calendars for conflicts:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+MICROSOFT_USER_EMAIL=hakan@ambitionvalley.nl       # Primary calendar
+MICROSOFT_USER_EMAIL_SECONDARY=ramin@ambitionvalley.nl  # Secondary calendar
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+When a customer tries to book, the system:
+1. Gets busy slots from both calendars
+2. Filters out times that conflict with either calendar
+3. Only shows available times in the booking widget
 
-## Deploy on Vercel
+### Testing Outlook Integration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npx tsx scripts/test-microsoft-graph.ts
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This tests:
+- Access token retrieval
+- User access for both calendars
+- Combined availability check
+- Calendar event creation with Teams meeting
+
+### Timezone Handling
+
+All availability calculations use **Europe/Amsterdam** timezone:
+- Database stores `day_of_week` (0=Sunday, 1=Monday, etc.)
+- Backend generates slots with explicit timezone offsets
+- Frontend displays dates in local timezone
+
+## Environment Variables
+
+### Required for Production
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
+SUPABASE_SERVICE_ROLE_KEY=xxx
+
+# Microsoft Graph (Outlook + Teams)
+MICROSOFT_CLIENT_ID=xxx
+MICROSOFT_CLIENT_SECRET=xxx
+MICROSOFT_TENANT_ID=xxx
+MICROSOFT_USER_EMAIL=hakan@ambitionvalley.nl
+MICROSOFT_USER_EMAIL_SECONDARY=ramin@ambitionvalley.nl
+
+# Resend (Email)
+RESEND_API_KEY=xxx
+
+# Base URL
+NEXT_PUBLIC_BASE_URL=https://check.ambitionvalley.nl
+```
+
+### Local Development
+
+```env
+# Use local Supabase (run: npx supabase start)
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<from supabase start>
+SUPABASE_SERVICE_ROLE_KEY=<from supabase start>
+```
+
+## Commands
+
+```bash
+# Development
+npm run dev              # Start dev server (localhost:3000)
+npm run build            # Production build
+npm run start            # Start production server
+
+# Testing
+npm run test             # Run unit tests (Vitest)
+npx tsx scripts/test-microsoft-graph.ts  # Test Outlook integration
+
+# Database (Local Supabase)
+npx supabase start       # Start local Supabase (Docker required)
+npx supabase stop        # Stop local Supabase
+npx supabase db reset    # Reset and apply migrations
+
+# Generate TypeScript types from database
+npx supabase gen types typescript --local > src/lib/supabase/types.ts
+
+# Deploy
+vercel --prod            # Deploy to Vercel production
+```
+
+## Database Schema
+
+### Key Tables
+
+- `event_types` - Appointment types (slug, title, duration, price, location)
+- `availability_schedules` - Weekly recurring availability (day_of_week, start_time, end_time)
+- `bookings` - Customer bookings with status tracking
+- `blocked_times` - Manually blocked time slots
+
+### Day of Week Convention
+
+```
+0 = Sunday (Zondag)
+1 = Monday (Maandag)
+2 = Tuesday (Dinsdag)
+3 = Wednesday (Woensdag)
+4 = Thursday (Donderdag)
+5 = Friday (Vrijdag)
+6 = Saturday (Zaterdag)
+```
+
+## Microsoft Azure Setup
+
+### Required API Permissions (Application)
+
+In Azure Portal → App Registrations → API Permissions:
+
+- `User.Read.All` - Read user profiles
+- `Calendars.ReadWrite` - Create/read calendar events
+- `OnlineMeetings.ReadWrite.All` - Create Teams meetings
+
+**Important:** Grant admin consent after adding permissions.
+
+### Authentication Flow
+
+Uses OAuth2 Client Credentials flow (app-only, no user login required):
+```
+POST https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token
+```
+
+## Troubleshooting
+
+### Calendar shows wrong days (off by one)
+
+The calendar was showing Tuesday-Saturday instead of Monday-Friday. This was caused by:
+1. **Backend**: Using `toISOString()` which converts to UTC
+2. **Frontend**: Same issue in `BookingCalendar.tsx`
+
+**Fix**: Use explicit timezone offsets and local date formatting.
+
+### Outlook integration not checking secondary calendar
+
+Make sure `MICROSOFT_USER_EMAIL_SECONDARY` is set in `.env.local` and on Vercel.
+
+### "Access token only works with delegated authentication"
+
+The `/me/calendar/getSchedule` endpoint requires user login. Use `/users/{email}/calendar/getSchedule` instead for application credentials.
+
+## File Locations
+
+| Feature | Location |
+|---------|----------|
+| Booking API | `src/app/api/booking/` |
+| Calendar Component | `src/integrations/booking/components/BookingCalendar.tsx` |
+| Availability Logic | `src/integrations/booking/lib/availability.ts` |
+| Microsoft Graph | `src/integrations/booking/lib/microsoft-graph.ts` |
+| Database Migrations | `supabase/migrations/` |
+| Test Scripts | `scripts/` |
