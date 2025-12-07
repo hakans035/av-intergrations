@@ -195,7 +195,7 @@ export default async function BookingPage({ searchParams }: BookingPageProps) {
                 href={buildBookingUrl(groepsdag.slug)}
                 className="inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 bg-white/10 border border-white/20 text-white rounded-xl font-semibold hover:bg-white/20 transition-all group"
               >
-                Bekijk groepsdagen
+                Plan groepsdag intake
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>

@@ -30,6 +30,23 @@ interface AvailabilityContext {
 // ============================================
 
 /**
+ * Get day of week in Europe/Amsterdam timezone
+ * JavaScript's getDay() uses local timezone which can cause issues on servers running in UTC
+ */
+function getDayOfWeekInAmsterdam(date: Date): number {
+  // Format the date in Amsterdam timezone and extract the day
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Amsterdam',
+    weekday: 'short',
+  });
+  const dayName = formatter.format(date);
+  const dayMap: Record<string, number> = {
+    'Sun': 0, 'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6,
+  };
+  return dayMap[dayName] ?? 0;
+}
+
+/**
  * Generate time slots from recurring weekly schedules
  */
 export function generateSlotsFromSchedule(
@@ -43,12 +60,13 @@ export function generateSlotsFromSchedule(
   const slots: TimeSlot[] = [];
   const current = new Date(startDate);
 
-  // Move to the start of the day
+  // Move to the start of the day in Amsterdam timezone
   current.setHours(0, 0, 0, 0);
 
   while (current <= endDate) {
-    // Check if this day matches the schedule's day of week
-    if (current.getDay() === schedule.day_of_week && schedule.is_active) {
+    // Check if this day matches the schedule's day of week (using Amsterdam timezone)
+    const currentDayOfWeek = getDayOfWeekInAmsterdam(current);
+    if (currentDayOfWeek === schedule.day_of_week && schedule.is_active) {
       // Parse start and end times from schedule
       const [startHour, startMinute] = schedule.start_time.split(':').map(Number);
       const [endHour, endMinute] = schedule.end_time.split(':').map(Number);
