@@ -58,10 +58,17 @@ export function generateSlotsFromSchedule(
   bufferAfter: number = 0
 ): TimeSlot[] {
   const slots: TimeSlot[] = [];
-  const current = new Date(startDate);
 
-  // Move to the start of the day in Amsterdam timezone
-  current.setHours(0, 0, 0, 0);
+  // Get the date in Amsterdam timezone and create a proper midnight date
+  // This prevents the UTC setHours(0,0,0,0) from shifting the date by 1 day
+  const dateFormatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Amsterdam',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const startDateStr = dateFormatter.format(startDate);
+  const current = new Date(`${startDateStr}T00:00:00`);
 
   while (current <= endDate) {
     // Check if this day matches the schedule's day of week (using Amsterdam timezone)
