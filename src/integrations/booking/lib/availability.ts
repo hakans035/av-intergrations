@@ -47,6 +47,29 @@ function getDayOfWeekInAmsterdam(date: Date): number {
 }
 
 /**
+ * Get Amsterdam timezone offset for a given date (handles CET/CEST)
+ */
+function getAmsterdamTimezoneOffset(dateStr: string): string {
+  // Create a date at noon to safely determine the offset
+  const testDate = new Date(`${dateStr}T12:00:00Z`);
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Amsterdam',
+    timeZoneName: 'longOffset',
+  });
+  const parts = formatter.formatToParts(testDate);
+  const tzName = parts.find(p => p.type === 'timeZoneName')?.value || 'GMT+1';
+
+  // Parse "GMT+1" or "GMT+2" to "+01:00" or "+02:00"
+  const match = tzName.match(/GMT([+-])(\d+)/);
+  if (match) {
+    const sign = match[1];
+    const hours = match[2].padStart(2, '0');
+    return `${sign}${hours}:00`;
+  }
+  return '+01:00'; // Default to CET
+}
+
+/**
  * Generate time slots from recurring weekly schedules
  */
 export function generateSlotsFromSchedule(
@@ -59,31 +82,38 @@ export function generateSlotsFromSchedule(
 ): TimeSlot[] {
   const slots: TimeSlot[] = [];
 
-  // Get the date in Amsterdam timezone and create a proper midnight date
-  // This prevents the UTC setHours(0,0,0,0) from shifting the date by 1 day
+  // Get the date string in Amsterdam timezone
   const dateFormatter = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Europe/Amsterdam',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
   });
-  const startDateStr = dateFormatter.format(startDate);
-  const current = new Date(`${startDateStr}T00:00:00`);
 
-  while (current <= endDate) {
-    // Check if this day matches the schedule's day of week (using Amsterdam timezone)
-    const currentDayOfWeek = getDayOfWeekInAmsterdam(current);
+  // Start from the Amsterdam date
+  let currentDateStr = dateFormatter.format(startDate);
+  const endDateStr = dateFormatter.format(endDate);
+
+  while (currentDateStr <= endDateStr) {
+    // Check if this day matches the schedule's day of week
+    // Create a noon date to safely check the day of week
+    const noonDate = new Date(`${currentDateStr}T12:00:00Z`);
+    const currentDayOfWeek = getDayOfWeekInAmsterdam(noonDate);
+
     if (currentDayOfWeek === schedule.day_of_week && schedule.is_active) {
       // Parse start and end times from schedule
       const [startHour, startMinute] = schedule.start_time.split(':').map(Number);
       const [endHour, endMinute] = schedule.end_time.split(':').map(Number);
 
-      // Create slots for this day
-      const dayStart = new Date(current);
-      dayStart.setHours(startHour, startMinute, 0, 0);
+      // Determine Amsterdam timezone offset for this date (CET or CEST)
+      const tzOffset = getAmsterdamTimezoneOffset(currentDateStr);
 
-      const dayEnd = new Date(current);
-      dayEnd.setHours(endHour, endMinute, 0, 0);
+      // Create slot times with explicit timezone
+      const dayStartISO = `${currentDateStr}T${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}:00${tzOffset}`;
+      const dayEndISO = `${currentDateStr}T${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}:00${tzOffset}`;
+
+      const dayStart = new Date(dayStartISO);
+      const dayEnd = new Date(dayEndISO);
 
       // Generate slots with buffer consideration
       const slotDuration = durationMinutes + bufferBefore + bufferAfter;
@@ -103,8 +133,10 @@ export function generateSlotsFromSchedule(
       }
     }
 
-    // Move to next day
-    current.setDate(current.getDate() + 1);
+    // Move to next day by parsing and incrementing the date string
+    const [year, month, day] = currentDateStr.split('-').map(Number);
+    const nextDate = new Date(year, month - 1, day + 1);
+    currentDateStr = dateFormatter.format(nextDate);
   }
 
   return slots;
