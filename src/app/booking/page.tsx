@@ -24,7 +24,7 @@ async function getIntakeEventTypes(): Promise<{ intake: EventType | null; groeps
   const { data, error } = await supabase
     .from('event_types')
     .select('*')
-    .in('slug', ['gratis-intake', 'ambition-wealth-circle'])
+    .in('slug', ['gratis-intake', 'gratis-groepsdag-intake'])
     .eq('is_active', true);
 
   if (error) {
@@ -33,7 +33,7 @@ async function getIntakeEventTypes(): Promise<{ intake: EventType | null; groeps
   }
 
   const intake = data?.find(e => e.slug === 'gratis-intake') as EventType | undefined;
-  const groepsdag = data?.find(e => e.slug === 'ambition-wealth-circle') as EventType | undefined;
+  const groepsdag = data?.find(e => e.slug === 'gratis-groepsdag-intake') as EventType | undefined;
 
   return { intake: intake || null, groepsdag: groepsdag || null };
 }

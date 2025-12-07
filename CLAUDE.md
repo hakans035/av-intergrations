@@ -117,3 +117,12 @@ Required in `.env.local`:
 ## Deployment
 
 **Important**: Do NOT deploy to Vercel automatically after commits. Only deploy when the user explicitly says "deploy to vercel".
+
+## Git Commits
+
+**Important**: Never use Claude as co-author in commits. Do NOT add:
+- `Co-Authored-By: Claude`
+- `🤖 Generated with Claude Code`
+- Any other Claude attribution
+
+Keep commit messages clean and professional without AI attribution.
