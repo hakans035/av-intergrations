@@ -18,6 +18,15 @@ interface ApiTimeSlot {
   remainingSeats?: number;
 }
 
+// Helper function to format date as YYYY-MM-DD in local timezone
+// This avoids timezone issues with toISOString() which converts to UTC
+function formatDateKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export function BookingCalendar({
   eventTypeId,
   onSelectSlot,
@@ -76,7 +85,7 @@ export function BookingCalendar({
     const grouped = new Map<string, TimeSlot[]>();
     slots.forEach((slot) => {
       if (!slot.available) return;
-      const dateKey = slot.start.toISOString().split('T')[0];
+      const dateKey = formatDateKey(slot.start);
       const existing = grouped.get(dateKey) || [];
       grouped.set(dateKey, [...existing, slot]);
     });
@@ -124,7 +133,7 @@ export function BookingCalendar({
 
   // Check if a date has available slots
   const isDateAvailable = (date: Date) => {
-    const dateKey = date.toISOString().split('T')[0];
+    const dateKey = formatDateKey(date);
     return availableDates.has(dateKey);
   };
 
@@ -138,7 +147,7 @@ export function BookingCalendar({
   // Get slots for selected date
   const slotsForSelectedDate = useMemo(() => {
     if (!selectedDate) return [];
-    const dateKey = selectedDate.toISOString().split('T')[0];
+    const dateKey = formatDateKey(selectedDate);
     return slotsByDate.get(dateKey) || [];
   }, [selectedDate, slotsByDate]);
 
@@ -204,8 +213,7 @@ export function BookingCalendar({
             const isAvailable = !isPast && isDateAvailable(date);
             const isSelected =
               selectedDate &&
-              date.toISOString().split('T')[0] ===
-                selectedDate.toISOString().split('T')[0];
+              formatDateKey(date) === formatDateKey(selectedDate);
 
             return (
               <button
