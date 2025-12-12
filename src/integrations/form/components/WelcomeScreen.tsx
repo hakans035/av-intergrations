@@ -17,11 +17,11 @@ export function WelcomeScreenComponent({ screen, onStart }: WelcomeScreenProps) 
       </h1>
 
       {/* Savings highlight - wow effect */}
-      <div className="animate-fade-in-up opacity-0 animation-delay-100 mb-8 w-full flex justify-center">
-        <div className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 rounded-2xl bg-green-500/15 border border-green-400/40">
-          <Euro className="w-5 h-5 sm:w-6 sm:h-6 text-green-300" />
-          <span className="text-base sm:text-xl font-semibold text-white text-center">
-            Bespaar <span className="text-green-300">€3.000 - €15.000</span> per jaar
+      <div className="animate-fade-in-up opacity-0 animation-delay-100 mb-8 w-full flex justify-center px-2">
+        <div className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-green-500/15 border border-green-400/40">
+          <Euro className="w-5 h-5 sm:w-6 sm:h-6 text-green-300 flex-shrink-0" />
+          <span className="text-sm sm:text-xl font-semibold text-white">
+            Bespaar <span className="text-green-300 whitespace-nowrap">€3.000 - €15.000</span> per jaar
           </span>
         </div>
       </div>
