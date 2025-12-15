@@ -33,3 +33,11 @@ export type { IntakeFollowUpEmailProps } from './templates/intakeFollowUp'
 // Invoice email template
 export { InvoiceEmail, getInvoiceEmailSubject } from './templates/invoiceEmail'
 export type { InvoiceEmailProps } from './templates/invoiceEmail'
+
+// Team notification email template
+export { TeamNotificationEmail, getTeamNotificationSubject } from './templates/teamNotification'
+export type { TeamNotificationEmailProps, NotificationType } from './templates/teamNotification'
+
+// Lead follow-up email template
+export { LeadFollowUpEmail, getLeadFollowUpSubject } from './templates/leadFollowUp'
+export type { LeadFollowUpEmailProps } from './templates/leadFollowUp'

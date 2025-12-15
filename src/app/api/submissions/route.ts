@@ -4,6 +4,7 @@ import { formSubmissionSchema } from '@/lib/validation/schemas';
 import { validateCsrfToken } from '@/lib/security/csrf';
 import { rateLimit, getClientIp, getRateLimitHeaders } from '@/lib/security/rate-limit';
 import { sendEmail, renderEmailTemplate, FormSubmissionEmail, getFormEmailSubject } from '@/lib/email';
+import { sendTeamNotification } from '@/lib/email/sendTeamNotification';
 import { ambitionValleyForm } from '@/integrations/form/data/ambition-valley-form';
 
 export async function POST(request: Request) {
@@ -172,6 +173,20 @@ export async function POST(request: Request) {
     } else {
       console.log(`[${requestId}] Step 6: Skipping email (no email address)`);
     }
+
+    // Send team notification (don't await to not block response)
+    console.log(`[${requestId}] Step 7: Sending team notification...`);
+    sendTeamNotification({
+      type: 'new_lead',
+      leadName: name,
+      leadEmail: email,
+      leadPhone: phone,
+      qualificationResult,
+    }).then(() => {
+      console.log(`[${requestId}] Team notification sent`);
+    }).catch((err) => {
+      console.error(`[${requestId}] Team notification error:`, err);
+    });
 
     const duration = Date.now() - startTime;
     console.log(`[${requestId}] ====== Form Submission Complete ======`);

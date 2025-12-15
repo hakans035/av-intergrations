@@ -2,10 +2,66 @@
 
 import { useState } from 'react'
 import type { FormSubmission } from '@/lib/supabase/types'
+import { ambitionValleyForm } from '@/integrations/form/data/ambition-valley-form'
 
 interface SubmissionsTableProps {
   submissions: FormSubmission[]
   onViewDetails?: (submission: FormSubmission) => void
+}
+
+// Build lookup maps from form definition
+const fieldRefToTitle = new Map<string, string>()
+const choiceRefToLabel = new Map<string, string>()
+const fieldOrder = new Map<string, number>()
+
+ambitionValleyForm.fields.forEach((field, index) => {
+  fieldRefToTitle.set(field.ref, field.title)
+  fieldOrder.set(field.ref, index)
+  if (field.properties.choices) {
+    field.properties.choices.forEach((choice) => {
+      choiceRefToLabel.set(choice.ref, choice.label)
+    })
+  }
+})
+
+// Helper to sort answers by form field order
+function sortAnswersByFieldOrder(answers: Record<string, unknown>): [string, unknown][] {
+  return Object.entries(answers).sort(([keyA], [keyB]) => {
+    const orderA = fieldOrder.get(keyA) ?? 999
+    const orderB = fieldOrder.get(keyB) ?? 999
+    return orderA - orderB
+  })
+}
+
+// Helper to format answer values
+function formatAnswerValue(value: unknown): string {
+  if (value === null || value === undefined) return '-'
+  if (value === 'yes') return 'Ja'
+  if (value === 'no') return 'Nee'
+  if (value === true) return 'Ja'
+  if (value === false) return 'Nee'
+
+  if (typeof value === 'string') {
+    // Check if it's a choice ref
+    const label = choiceRefToLabel.get(value)
+    if (label) return label
+    return value
+  }
+
+  if (Array.isArray(value)) {
+    // Array of choice refs
+    return value
+      .map((v) => {
+        if (typeof v === 'string') {
+          const label = choiceRefToLabel.get(v)
+          return label || v
+        }
+        return String(v)
+      })
+      .join(', ')
+  }
+
+  return String(value)
 }
 
 const qualificationLabels: Record<string, { label: string; className: string }> = {
@@ -184,7 +240,7 @@ function SubmissionDetailModal({ submission, onClose }: SubmissionDetailModalPro
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
         {/* Backdrop */}
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
@@ -192,7 +248,7 @@ function SubmissionDetailModal({ submission, onClose }: SubmissionDetailModalPro
         />
 
         {/* Modal */}
-        <div className="inline-block align-bottom glass rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+        <div className="relative glass rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all my-8 max-w-2xl w-full mx-4">
           {/* Header */}
           <div className="px-6 py-4 border-b border-white/10">
             <div className="flex items-center justify-between">
@@ -255,14 +311,22 @@ function SubmissionDetailModal({ submission, onClose }: SubmissionDetailModalPro
             <div>
               <h4 className="text-sm font-medium text-white mb-3">Antwoorden</h4>
               <div className="bg-white/5 rounded-xl p-4 border border-white/10 space-y-3">
-                {Object.entries(answers).map(([key, value]) => (
-                  <div key={key} className="border-b border-white/10 last:border-0 pb-3 last:pb-0">
-                    <p className="text-xs text-white/40 truncate" title={key}>{key}</p>
-                    <p className="text-sm font-medium text-white mt-0.5">
-                      {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                    </p>
-                  </div>
-                ))}
+                {sortAnswersByFieldOrder(answers).map(([key, value]) => {
+                  const questionTitle = fieldRefToTitle.get(key) || key
+                  const formattedValue = formatAnswerValue(value)
+
+                  // Skip empty values
+                  if (!formattedValue || formattedValue === '-') return null
+
+                  return (
+                    <div key={key} className="border-b border-white/10 last:border-0 pb-3 last:pb-0">
+                      <p className="text-xs text-white/40">{questionTitle}</p>
+                      <p className="text-sm font-medium text-white mt-0.5">
+                        {formattedValue}
+                      </p>
+                    </div>
+                  )
+                })}
               </div>
             </div>
 

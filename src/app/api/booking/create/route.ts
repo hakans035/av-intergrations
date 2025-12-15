@@ -6,6 +6,7 @@ import {
 } from '@/integrations/booking/lib/microsoft-graph';
 import { isSlotAvailable } from '@/integrations/booking/lib/availability';
 import { sendBookingEmails } from '@/lib/email/workflows';
+import { sendTeamNotification } from '@/lib/email/sendTeamNotification';
 import type { EventType, Booking, BlockedTime } from '@/integrations/booking/types';
 
 // Validation schema
@@ -179,6 +180,34 @@ export async function POST(request: Request) {
         console.error('[API] Failed to send booking emails:', emailError);
         // Don't fail the booking creation
       }
+
+      // Send team notification
+      const eventDate = startTime.toLocaleDateString('nl-NL', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'Europe/Amsterdam',
+      });
+      const eventTime = startTime.toLocaleTimeString('nl-NL', {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Europe/Amsterdam',
+      });
+
+      sendTeamNotification({
+        type: 'new_booking',
+        leadName: data.customerName,
+        leadEmail: data.customerEmail,
+        leadPhone: data.customerPhone,
+        eventTitle: eventType.title,
+        eventDate,
+        eventTime,
+      }).then(() => {
+        console.log('[API] Team notification sent for booking:', booking.id);
+      }).catch((err) => {
+        console.error('[API] Team notification error:', err);
+      });
     }
 
     return NextResponse.json({

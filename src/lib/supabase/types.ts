@@ -571,6 +571,7 @@ export type Database = {
           completed_at: string | null
           created_at: string | null
           email: string | null
+          followup_email_sent_at: string | null
           form_id: string
           id: string
           ip_address: string | null
@@ -593,6 +594,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           email?: string | null
+          followup_email_sent_at?: string | null
           form_id: string
           id?: string
           ip_address?: string | null
@@ -615,6 +617,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string | null
           email?: string | null
+          followup_email_sent_at?: string | null
           form_id?: string
           id?: string
           ip_address?: string | null

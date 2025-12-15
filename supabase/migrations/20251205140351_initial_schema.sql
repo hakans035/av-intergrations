@@ -34,6 +34,9 @@ CREATE TABLE form_events (
   timestamp TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Follow-up tracking
+ALTER TABLE form_submissions ADD COLUMN IF NOT EXISTS followup_email_sent_at TIMESTAMPTZ;
+
 -- Indexes
 CREATE INDEX idx_form_submissions_form_id ON form_submissions(form_id);
 CREATE INDEX idx_form_submissions_email ON form_submissions(email);
