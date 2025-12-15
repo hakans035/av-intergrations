@@ -225,7 +225,7 @@ export async function POST(request: Request) {
 }
 
 /**
- * Extract a contact field value from answers by checking field type and possible field names
+ * Extract a contact field value from answers by checking field type, title, or possible field names
  */
 function extractContactField(
   answers: Record<string, unknown>,
@@ -240,7 +240,17 @@ function extractContactField(
     }
   }
 
-  // Fallback: check for human-readable keys
+  // Try to find by field title containing any of the possible keys
+  for (const key of possibleKeys) {
+    const field = ambitionValleyForm.fields.find(f =>
+      f.title.toLowerCase().includes(key.toLowerCase())
+    );
+    if (field && answers[field.ref] && typeof answers[field.ref] === 'string') {
+      return answers[field.ref] as string;
+    }
+  }
+
+  // Fallback: check for human-readable keys in answers directly
   for (const key of possibleKeys) {
     // Check exact key match
     if (answers[key] && typeof answers[key] === 'string') {
