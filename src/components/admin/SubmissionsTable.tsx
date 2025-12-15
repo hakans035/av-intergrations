@@ -13,16 +13,57 @@ interface SubmissionsTableProps {
 const fieldRefToTitle = new Map<string, string>()
 const choiceRefToLabel = new Map<string, string>()
 const fieldOrder = new Map<string, number>()
+const fieldRefByType = new Map<string, string>()
 
 ambitionValleyForm.fields.forEach((field, index) => {
   fieldRefToTitle.set(field.ref, field.title)
   fieldOrder.set(field.ref, index)
+
+  // Track field refs by type for easy lookup
+  if (field.type === 'email') fieldRefByType.set('email', field.ref)
+  if (field.type === 'phone_number') fieldRefByType.set('phone', field.ref)
+  if (field.title.toLowerCase().includes('naam')) fieldRefByType.set('name', field.ref)
+
   if (field.properties.choices) {
     field.properties.choices.forEach((choice) => {
       choiceRefToLabel.set(choice.ref, choice.label)
     })
   }
 })
+
+// Helper to extract contact info from answers
+function getContactFromAnswers(submission: FormSubmission): { name: string; email: string; phone: string } {
+  const answers = submission.answers as Record<string, unknown>
+
+  // Get name - first from submission.name, then from answers
+  let name = submission.name || ''
+  if (!name) {
+    const nameRef = fieldRefByType.get('name')
+    if (nameRef && answers[nameRef]) {
+      name = String(answers[nameRef])
+    }
+  }
+
+  // Get email - first from submission.email, then from answers
+  let email = submission.email || ''
+  if (!email) {
+    const emailRef = fieldRefByType.get('email')
+    if (emailRef && answers[emailRef]) {
+      email = String(answers[emailRef])
+    }
+  }
+
+  // Get phone - first from submission.phone, then from answers
+  let phone = submission.phone || ''
+  if (!phone) {
+    const phoneRef = fieldRefByType.get('phone')
+    if (phoneRef && answers[phoneRef]) {
+      phone = String(answers[phoneRef])
+    }
+  }
+
+  return { name, email, phone }
+}
 
 // Helper to sort answers by form field order
 function sortAnswersByFieldOrder(answers: Record<string, unknown>): [string, unknown][] {
@@ -159,6 +200,12 @@ export function SubmissionsTable({ submissions, onViewDetails }: SubmissionsTabl
                   label: submission.qualification_result,
                   className: 'bg-white/10 text-white/70 border border-white/20',
                 }
+                const contact = getContactFromAnswers(submission)
+                const displayName = contact.name || 'Onbekend'
+                const displayEmail = contact.email || 'Geen e-mail'
+                const initials = displayName !== 'Onbekend'
+                  ? displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+                  : 'A'
 
                 return (
                   <tr
@@ -168,17 +215,17 @@ export function SubmissionsTable({ submissions, onViewDetails }: SubmissionsTabl
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 bg-white/20 rounded-full flex items-center justify-center">
-                          <span className="text-white font-medium text-sm">
-                            {(submission.name || 'A')[0].toUpperCase()}
+                        <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                          <span className="text-white font-semibold text-sm">
+                            {initials}
                           </span>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-white">
-                            {submission.name || 'Onbekend'}
+                          <div className="text-sm font-semibold text-white">
+                            {displayName}
                           </div>
-                          <div className="text-sm text-white/50">
-                            {submission.email || 'Geen e-mail'}
+                          <div className="text-sm text-white/60">
+                            {displayEmail}
                           </div>
                         </div>
                       </div>
@@ -237,32 +284,39 @@ function SubmissionDetailModal({ submission, onClose }: SubmissionDetailModalPro
   }
 
   const answers = submission.answers as Record<string, unknown>
+  const contact = getContactFromAnswers(submission)
+  const displayName = contact.name || 'Onbekend'
+  const displayEmail = contact.email || 'Geen e-mail'
+  const displayPhone = contact.phone || 'Niet ingevuld'
+  const initials = displayName !== 'Onbekend'
+    ? displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'A'
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
         {/* Backdrop */}
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
           onClick={onClose}
         />
 
         {/* Modal */}
         <div className="relative glass rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all my-8 max-w-2xl w-full mx-4">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-white/10">
+          <div className="px-6 py-5 border-b border-white/10 bg-gradient-to-r from-blue-600/20 to-purple-600/20">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center">
-                  <span className="text-white font-medium text-lg">
-                    {(submission.name || 'A')[0].toUpperCase()}
+                <div className="h-14 w-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-lg">
+                    {initials}
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white">
-                    {submission.name || 'Onbekend'}
+                  <h3 className="text-xl font-bold text-white">
+                    {displayName}
                   </h3>
-                  <p className="text-sm text-white/50">{submission.email || 'Geen e-mail'}</p>
+                  <p className="text-sm text-white/60">{displayEmail}</p>
                 </div>
               </div>
               <button
@@ -289,7 +343,7 @@ function SubmissionDetailModal({ submission, onClose }: SubmissionDetailModalPro
               <div className="bg-white/5 rounded-xl p-4 border border-white/10">
                 <p className="text-xs font-medium text-white/50 uppercase">Telefoon</p>
                 <p className="mt-1 text-sm font-medium text-white">
-                  {submission.phone || 'Niet ingevuld'}
+                  {displayPhone}
                 </p>
               </div>
               <div className="bg-white/5 rounded-xl p-4 border border-white/10">
@@ -366,9 +420,9 @@ function SubmissionDetailModal({ submission, onClose }: SubmissionDetailModalPro
             >
               Sluiten
             </button>
-            {submission.email && (
+            {displayEmail !== 'Geen e-mail' && (
               <a
-                href={`mailto:${submission.email}`}
+                href={`mailto:${displayEmail}`}
                 className="px-4 py-2.5 text-sm font-medium text-[#1062eb] bg-white rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all"
               >
                 E-mail sturen
