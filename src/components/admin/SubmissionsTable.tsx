@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import type { FormSubmission } from '@/lib/supabase/types'
 import { ambitionValleyForm } from '@/integrations/form/data/ambition-valley-form'
 
@@ -278,6 +279,17 @@ interface SubmissionDetailModalProps {
 }
 
 function SubmissionDetailModal({ submission, onClose }: SubmissionDetailModalProps) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [])
+
   const qualification = qualificationLabels[submission.qualification_result] || {
     label: submission.qualification_result,
     className: 'bg-white/10 text-white/70 border border-white/20',
@@ -292,8 +304,10 @@ function SubmissionDetailModal({ submission, onClose }: SubmissionDetailModalPro
     ? displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : 'A'
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+  if (!mounted) return null
+
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
         {/* Backdrop */}
         <div
@@ -433,4 +447,6 @@ function SubmissionDetailModal({ submission, onClose }: SubmissionDetailModalPro
       </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }
