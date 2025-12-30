@@ -13,9 +13,9 @@ export function WelcomeScreenComponent({ screen, onStart }: WelcomeScreenProps) 
     <div className="flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4">
       {/* Badge */}
       <div className="animate-fade-in-up opacity-0 mb-8">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-medium">
-          <Sparkles className="w-4 h-4 text-yellow-300" />
-          <span className="text-white/90">Gemiddeld €3.000 - €15.000 besparing</span>
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass text-xs sm:text-sm font-medium">
+          <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-300 flex-shrink-0" />
+          <span className="text-white/90"><em>Gemiddelde besparing per deelnemer: €3.000 – €15.000 per jaar</em></span>
         </div>
       </div>
 

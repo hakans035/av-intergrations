@@ -20,7 +20,7 @@ export const ambitionValleyForm: FormDefinition = {
         show_button: true,
         button_text: 'Start de gratis check',
         description:
-          '2.847+ ondernemers gingen je voor. Gemiddelde besparing: €3.000 - €15.000 per jaar. Duurt slechts 2 minuten.',
+          '728+ ondernemers gingen je voor. Gemiddelde besparing: €3.000 – €15.000 per jaar. Duurt slechts 2 minuten.',
       },
     },
   ],
