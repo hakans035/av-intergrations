@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Clock, Check, Euro } from 'lucide-react';
+import { ArrowRight, Clock, Check } from 'lucide-react';
 import { WelcomeScreen as WelcomeScreenType } from '../types';
 
 interface WelcomeScreenProps {
@@ -16,12 +16,14 @@ export function WelcomeScreenComponent({ screen, onStart }: WelcomeScreenProps) 
         <span className="gradient-text">{screen.title}</span>
       </h1>
 
-      {/* Savings highlight - wow effect */}
+      {/* Savings highlight - stacked layout */}
       <div className="animate-fade-in-up opacity-0 animation-delay-100 mb-8 w-full flex justify-center px-2">
-        <div className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 sm:py-3 rounded-2xl bg-green-500/15 border border-green-400/40">
-          <Euro className="w-5 h-5 sm:w-6 sm:h-6 text-green-300 flex-shrink-0" />
-          <span className="text-sm sm:text-xl font-semibold text-white">
-            <em>Gemiddelde besparing per deelnemer: <span className="text-green-300 whitespace-nowrap">3.000 – 15.000</span> per jaar</em>
+        <div className="flex flex-col items-center gap-1 sm:gap-2">
+          <span className="text-sm sm:text-base text-white/70 font-medium">
+            Gemiddelde besparing per deelnemer
+          </span>
+          <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-400">
+            €3.000 – €15.000 <span className="text-lg sm:text-xl font-medium text-white/60">per jaar</span>
           </span>
         </div>
       </div>
