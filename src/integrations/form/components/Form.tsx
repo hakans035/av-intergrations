@@ -279,7 +279,7 @@ export function Form({ form, onSubmit }: FormProps) {
         <div className="absolute top-4 right-4 sm:top-8 sm:right-8 md:top-10 md:right-10 z-10">
           <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 sm:px-4 sm:py-2">
             <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-300" strokeWidth={2} />
-            <span className="text-xs sm:text-sm text-white/90">1.928+ checks</span>
+            <span className="text-xs sm:text-sm text-white/90">728+ checks</span>
           </div>
         </div>
       )}
