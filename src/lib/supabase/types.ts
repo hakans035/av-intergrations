@@ -1278,3 +1278,11 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
+// Convenience type exports
+export type FormSubmission = Database['public']['Tables']['form_submissions']['Row']
+export type FormSubmissionInsert = Database['public']['Tables']['form_submissions']['Insert']
+export type FormSubmissionUpdate = Database['public']['Tables']['form_submissions']['Update']
+export type FormEvent = Database['public']['Tables']['form_events']['Row']
+export type FormEventInsert = Database['public']['Tables']['form_events']['Insert']
+export type FormEventUpdate = Database['public']['Tables']['form_events']['Update']
