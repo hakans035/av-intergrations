@@ -433,7 +433,8 @@ export class WebflowClient {
     }
 
     // Add the actual file last (required by S3)
-    const blob = new Blob([fileBuffer], { type: createResponse.contentType || 'application/octet-stream' });
+    const uint8Array = new Uint8Array(fileBuffer);
+    const blob = new Blob([uint8Array], { type: createResponse.contentType || 'application/octet-stream' });
     formData.append('file', blob, file.fileName);
 
     // Upload to S3
@@ -446,7 +447,6 @@ export class WebflowClient {
       const errorText = await s3Response.text();
       throw new WebflowApiError(
         `S3 upload failed: ${errorText}`,
-        'S3_UPLOAD_ERROR',
         s3Response.status
       );
     }
