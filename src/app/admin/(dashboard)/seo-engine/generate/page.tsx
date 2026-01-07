@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { SEONavDropdown } from '../SEONavDropdown'
+import { SEONavDropdown } from '@/components/admin'
 
 interface KeywordQueueItem {
   id: string

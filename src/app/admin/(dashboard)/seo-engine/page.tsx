@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { StatsCard } from '@/components/admin/StatsCard'
 import { createWebflowClient } from '@/integrations/seo-engine'
-import { SEONavDropdown } from './SEONavDropdown'
+import { SEONavDropdown } from '@/components/admin'
 
 async function getWebflowPosts() {
   const apiToken = process.env.WEBFLOW_API_TOKEN

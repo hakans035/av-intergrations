@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
 import { StatsCard } from '@/components/admin/StatsCard'
 import { TriggerDiscoveryButton } from './TriggerDiscoveryButton'
-import { SEONavDropdown } from '../SEONavDropdown'
+import { SEONavDropdown } from '@/components/admin'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
