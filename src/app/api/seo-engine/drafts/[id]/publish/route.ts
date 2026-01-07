@@ -50,7 +50,7 @@ export async function POST(
       return Response.json({ error: 'Draft not found' }, { status: 404 });
     }
 
-    const draftData = draft as ContentDraft;
+    const draftData = draft as unknown as ContentDraft;
 
     // Check if already published
     if (draftData.status === 'published' && draftData.webflow_item_id) {
