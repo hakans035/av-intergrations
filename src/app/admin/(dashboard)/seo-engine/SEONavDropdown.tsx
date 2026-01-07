@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -47,31 +48,89 @@ const navItems = [
   },
 ]
 
-export function SEONavDropdown() {
-  const [isOpen, setIsOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const pathname = usePathname()
+function DropdownMenu({
+  buttonRect,
+  onClose,
+  pathname
+}: {
+  buttonRect: DOMRect
+  onClose: () => void
+  pathname: string
+}) {
+  const menuRef = useRef<HTMLDivElement>(null)
 
-  // Close dropdown when clicking outside
   useEffect(() => {
-    if (!isOpen) return
-
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onClose()
       }
     }
 
-    // Use setTimeout to avoid immediate triggering
+    // Small delay to prevent immediate close
     const timeoutId = setTimeout(() => {
       document.addEventListener('click', handleClickOutside)
-    }, 0)
+    }, 10)
 
     return () => {
       clearTimeout(timeoutId)
       document.removeEventListener('click', handleClickOutside)
     }
-  }, [isOpen])
+  }, [onClose])
+
+  return createPortal(
+    <div
+      ref={menuRef}
+      className="fixed w-64 py-2 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl animate-fade-in-up"
+      style={{
+        top: buttonRect.bottom + 8,
+        right: window.innerWidth - buttonRect.right,
+        zIndex: 99999,
+      }}
+    >
+      {navItems.map((item) => {
+        const isActive = pathname === item.href ||
+          (item.href !== '/admin/seo-engine' && pathname.startsWith(item.href))
+
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onClose}
+            className="block w-full"
+          >
+            <div className={`flex items-start gap-3 px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer ${
+              isActive ? 'bg-white/10' : ''
+            }`}>
+              <div className={`mt-0.5 ${isActive ? 'text-green-400' : 'text-white/60'}`}>
+                {item.icon}
+              </div>
+              <div>
+                <div className={`font-medium ${isActive ? 'text-white' : 'text-white/80'}`}>
+                  {item.label}
+                </div>
+                <div className="text-xs text-white/50">{item.description}</div>
+              </div>
+            </div>
+          </Link>
+        )
+      })}
+    </div>,
+    document.body
+  )
+}
+
+export function SEONavDropdown() {
+  const [isOpen, setIsOpen] = useState(false)
+  const [buttonRect, setButtonRect] = useState<DOMRect | null>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const pathname = usePathname()
+
+  const handleToggle = () => {
+    if (!isOpen && buttonRef.current) {
+      setButtonRect(buttonRef.current.getBoundingClientRect())
+    }
+    setIsOpen(!isOpen)
+  }
 
   // Get current page label
   const currentPage = navItems.find(item =>
@@ -80,9 +139,10 @@ export function SEONavDropdown() {
   ) || navItems[0]
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        ref={buttonRef}
+        onClick={handleToggle}
         className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-medium text-white transition-all duration-200 flex items-center gap-2"
       >
         {currentPage.icon}
@@ -97,36 +157,12 @@ export function SEONavDropdown() {
         </svg>
       </button>
 
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 py-2 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-xl z-50 animate-fade-in-up">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href ||
-              (item.href !== '/admin/seo-engine' && pathname.startsWith(item.href))
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                className={`block w-full cursor-pointer`}
-              >
-                <div className={`flex items-start gap-3 px-4 py-3 hover:bg-white/5 transition-colors ${
-                  isActive ? 'bg-white/10' : ''
-                }`}>
-                <div className={`mt-0.5 ${isActive ? 'text-green-400' : 'text-white/60'}`}>
-                  {item.icon}
-                </div>
-                <div>
-                  <div className={`font-medium ${isActive ? 'text-white' : 'text-white/80'}`}>
-                    {item.label}
-                  </div>
-                  <div className="text-xs text-white/50">{item.description}</div>
-                </div>
-                </div>
-              </Link>
-            )
-          })}
-        </div>
+      {isOpen && buttonRect && (
+        <DropdownMenu
+          buttonRect={buttonRect}
+          onClose={() => setIsOpen(false)}
+          pathname={pathname}
+        />
       )}
     </div>
   )
