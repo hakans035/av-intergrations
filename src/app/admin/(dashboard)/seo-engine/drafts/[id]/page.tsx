@@ -40,7 +40,7 @@ async function getDraft(id: string) {
     return null
   }
 
-  return draft as ContentDraft
+  return draft as unknown as ContentDraft
 }
 
 function getStatusBadge(status: string) {

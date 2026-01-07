@@ -30,7 +30,7 @@ async function getDrafts() {
     return []
   }
 
-  return (drafts || []) as ContentDraft[]
+  return (drafts || []) as unknown as ContentDraft[]
 }
 
 function getStatusBadge(status: string) {
