@@ -20,6 +20,10 @@ interface ContentDraft {
   status: string
   language: string
   webflow_item_id: string | null
+  hero_image_url: string | null
+  hero_image_asset_id: string | null
+  thumbnail_image_url: string | null
+  thumbnail_image_asset_id: string | null
 }
 
 export async function POST(
@@ -67,19 +71,40 @@ export async function POST(
       collectionId: process.env.WEBFLOW_COLLECTION_ID!,
     });
 
+    // Build field data with images if available
+    const fieldData: Record<string, unknown> = {
+      name: draftData.title,
+      slug: draftData.slug,
+      'post-summary': draftData.summary || '',
+      'rich-text': draftData.body,
+      'meta-title': draftData.meta_title || draftData.title,
+      'meta-description': draftData.meta_description || '',
+      'source-keyword': draftData.keyword,
+      language: draftData.language === 'nl' ? 'Dutch' : 'English',
+      'content-status': 'Published',
+    };
+
+    // Add hero image if available
+    if (draftData.hero_image_asset_id && draftData.hero_image_url) {
+      fieldData['main-image-2'] = {
+        fileId: draftData.hero_image_asset_id,
+        url: draftData.hero_image_url,
+        alt: `Illustratie bij ${draftData.title}`,
+      };
+    }
+
+    // Add thumbnail image if available
+    if (draftData.thumbnail_image_asset_id && draftData.thumbnail_image_url) {
+      fieldData['thumbnail-image'] = {
+        fileId: draftData.thumbnail_image_asset_id,
+        url: draftData.thumbnail_image_url,
+        alt: `Thumbnail ${draftData.title}`,
+      };
+    }
+
     // Publish to Webflow
     const [item] = await webflowClient.createItems([{
-      fieldData: {
-        name: draftData.title,
-        slug: draftData.slug,
-        'post-summary': draftData.summary || '',
-        'rich-text': draftData.body,
-        'meta-title': draftData.meta_title || draftData.title,
-        'meta-description': draftData.meta_description || '',
-        'source-keyword': draftData.keyword,
-        language: draftData.language === 'nl' ? 'Dutch' : 'English',
-        'content-status': 'Published',
-      },
+      fieldData,
       isDraft: false, // Publish immediately
     }]);
 

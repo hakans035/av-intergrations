@@ -6,7 +6,7 @@
  */
 
 import { createServiceClient } from '@/lib/supabase/server';
-import { ContentGeneratorService } from '@/integrations/seo-engine';
+import { ContentGeneratorService, createImageGeneratorWithWebflow, createWebflowClient } from '@/integrations/seo-engine';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -195,6 +195,53 @@ export async function POST(request: Request) {
         .eq('id', logEntry.id);
     }
 
+    // Generate images for the blog post
+    let heroImageUrl: string | null = null;
+    let heroImageAssetId: string | null = null;
+    let thumbnailImageUrl: string | null = null;
+    let thumbnailImageAssetId: string | null = null;
+
+    try {
+      const webflowClient = createWebflowClient({
+        apiToken: process.env.WEBFLOW_API_TOKEN!,
+        siteId: process.env.WEBFLOW_SITE_ID!,
+        collectionId: process.env.WEBFLOW_COLLECTION_ID!,
+      });
+
+      const imageGenerator = createImageGeneratorWithWebflow(
+        process.env.GEMINI_API_KEY!,
+        webflowClient
+      );
+
+      // Generate hero and thumbnail images
+      const imageResults = await imageGenerator.generatePostImages(
+        keyword.keyword,
+        processedContent.slug,
+        keyword.language as 'nl' | 'en',
+        process.env.WEBFLOW_SITE_ID
+      );
+
+      if (imageResults.hero?.success && imageResults.hero.image) {
+        heroImageUrl = imageResults.hero.image.webflowUrl;
+        heroImageAssetId = imageResults.hero.image.assetId;
+      }
+      if (imageResults.thumbnail?.success && imageResults.thumbnail.image) {
+        thumbnailImageUrl = imageResults.thumbnail.image.webflowUrl;
+        thumbnailImageAssetId = imageResults.thumbnail.image.assetId;
+      }
+
+      // Update log
+      if (logEntry) {
+        await supabase
+          .from('seo_generation_log' as any)
+          .update({ status: 'images_generated' })
+          .eq('id', logEntry.id);
+      }
+    } catch (imageError) {
+      console.error('Image generation failed (continuing without images):', imageError);
+      // Don't fail the whole process if image generation fails
+    }
+
     // Save to Supabase drafts table (NOT Webflow yet)
     const { data: draft, error: draftError } = await supabase
       .from('seo_content_drafts' as any)
@@ -209,6 +256,10 @@ export async function POST(request: Request) {
         meta_title: processedContent.metaTitle,
         meta_description: processedContent.metaDescription,
         schema_type: processedContent.schemaType,
+        hero_image_url: heroImageUrl,
+        hero_image_asset_id: heroImageAssetId,
+        thumbnail_image_url: thumbnailImageUrl,
+        thumbnail_image_asset_id: thumbnailImageAssetId,
         status: 'pending_review',
       })
       .select()
