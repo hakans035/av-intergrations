@@ -1,19 +1,19 @@
 /**
  * POST /api/seo-engine/cron/generate
  * Daily content generation from keyword queue
- * Schedule: Daily (06:00 CET)
+ * Saves to Supabase for review, then publish to Webflow after approval
+ * Schedule: Daily (05:00 CET)
  */
 
 import { createServiceClient } from '@/lib/supabase/server';
-import {
-  createWebflowClient,
-  ContentGeneratorService,
-} from '@/integrations/seo-engine';
+import { ContentGeneratorService } from '@/integrations/seo-engine';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Type for keyword queue items (until migration is run and types regenerated)
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+// Type for keyword queue items
 interface KeywordQueueItem {
   id: string;
   keyword: string;
@@ -25,7 +25,6 @@ interface KeywordQueueItem {
   metadata: Record<string, unknown>;
   created_at: string;
   processed_at: string | null;
-  webflow_item_id: string | null;
   error_message: string | null;
   retry_count: number;
 }
@@ -36,7 +35,6 @@ interface LogEntry {
   status: string;
   title: string | null;
   slug: string | null;
-  webflow_item_id: string | null;
   error_message: string | null;
   duration_ms: number | null;
   created_at: string;
@@ -102,11 +100,10 @@ export async function POST(request: Request) {
 
   // Check if we already generated content today (limit: 1 per day)
   const { count: todayCount } = await supabase
-    .from('seo_keyword_queue' as 'event_types')
+    .from('seo_content_drafts' as any)
     .select('*', { count: 'exact', head: true })
-    .eq('status', 'completed')
-    .gte('processed_at', `${today}T00:00:00Z`)
-    .lt('processed_at', `${today}T23:59:59Z`);
+    .gte('created_at', `${today}T00:00:00Z`)
+    .lt('created_at', `${today}T23:59:59Z`);
 
   if (todayCount && todayCount >= 1) {
     return Response.json({
@@ -118,9 +115,8 @@ export async function POST(request: Request) {
   }
 
   // Get next pending keyword from queue
-  // Direct query (no RPC needed)
   const result = await supabase
-    .from('seo_keyword_queue' as 'event_types')
+    .from('seo_keyword_queue' as any)
     .select('*')
     .eq('status', 'pending')
     .or(`scheduled_date.is.null,scheduled_date.lte.${today}`)
@@ -141,17 +137,17 @@ export async function POST(request: Request) {
 
   // Mark as in_progress
   await supabase
-    .from('seo_keyword_queue' as 'event_types')
-    .update({ status: 'in_progress' } as never)
-    .eq('id', keyword.id as never);
+    .from('seo_keyword_queue' as any)
+    .update({ status: 'in_progress' })
+    .eq('id', keyword.id);
 
   // Log start
   const logResult = await supabase
-    .from('seo_generation_log' as 'event_types')
+    .from('seo_generation_log' as any)
     .insert({
       keyword_queue_id: keyword.id,
       status: 'started',
-    } as never)
+    })
     .select()
     .single();
 
@@ -190,68 +186,69 @@ export async function POST(request: Request) {
     // Update log
     if (logEntry) {
       await supabase
-        .from('seo_generation_log' as 'event_types')
+        .from('seo_generation_log' as any)
         .update({
           status: 'content_generated',
           title: processedContent.title,
           slug: processedContent.slug,
-        } as never)
-        .eq('id', logEntry.id as never);
+        })
+        .eq('id', logEntry.id);
     }
 
-    // Save to Webflow as draft
-    const webflowClient = createWebflowClient({
-      apiToken: process.env.WEBFLOW_API_TOKEN!,
-      siteId: process.env.WEBFLOW_SITE_ID!,
-      collectionId: process.env.WEBFLOW_COLLECTION_ID!,
-    });
-
-    const [item] = await webflowClient.createItems([{
-      fieldData: {
-        name: processedContent.title,
+    // Save to Supabase drafts table (NOT Webflow yet)
+    const { data: draft, error: draftError } = await supabase
+      .from('seo_content_drafts' as any)
+      .insert({
+        keyword: keyword.keyword,
+        language: keyword.language,
+        content_type: contentType,
+        title: processedContent.title,
         slug: processedContent.slug,
-        'post-summary': processedContent.summary,
-        'rich-text': processedContent.body,
-        'meta-title': processedContent.metaTitle,
-        'meta-description': processedContent.metaDescription,
-        'source-keyword': keyword.keyword,
-        language: keyword.language === 'nl' ? 'Dutch' : 'English',
-      },
-      isDraft: true,
-    }]);
+        body: processedContent.body,
+        summary: processedContent.summary,
+        meta_title: processedContent.metaTitle,
+        meta_description: processedContent.metaDescription,
+        schema_type: processedContent.schemaType,
+        status: 'pending_review',
+      })
+      .select()
+      .single();
+
+    if (draftError) {
+      throw new Error(`Failed to save draft: ${draftError.message}`);
+    }
+
+    const draftId = (draft as any).id;
 
     // Update log
     if (logEntry) {
       await supabase
-        .from('seo_generation_log' as 'event_types')
+        .from('seo_generation_log' as any)
         .update({
-          status: 'saved_to_webflow',
-          webflow_item_id: item.id,
-        } as never)
-        .eq('id', logEntry.id as never);
+          status: 'saved_to_supabase',
+        })
+        .eq('id', logEntry.id);
     }
 
     // Update keyword status
     await supabase
-      .from('seo_keyword_queue' as 'event_types')
+      .from('seo_keyword_queue' as any)
       .update({
         status: 'completed',
         processed_at: new Date().toISOString(),
-        webflow_item_id: item.id,
-      } as never)
-      .eq('id', keyword.id as never);
+      })
+      .eq('id', keyword.id);
 
     // Send email notification
     const adminEmails = process.env.SEO_ADMIN_EMAILS?.split(',') || [];
-    const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL || 'https://app.ambitionvalley.nl';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://check.ambitionvalley.nl';
 
     if (adminEmails.length > 0) {
       try {
         await resend.emails.send({
           from: 'SEO Engine <noreply@ambitionvalley.nl>',
           to: adminEmails,
-          subject: `Nieuwe blog post ter review: ${processedContent.title}`,
+          subject: `Nieuwe blog ter review: ${processedContent.title}`,
           html: `
             <!DOCTYPE html>
             <html>
@@ -286,7 +283,7 @@ export async function POST(request: Request) {
                   <div class="value">${new Date().toLocaleString('nl-NL', { dateStyle: 'long', timeStyle: 'short' })}</div>
                 </div>
 
-                <a href="${appUrl}/admin/seo-engine/${item.id}" class="button">Review & Publiceren</a>
+                <a href="${appUrl}/admin/seo-engine/drafts/${draftId}" class="button">Review & Publiceren</a>
 
                 <p class="footer">Dit is een automatische notificatie van de AmbitionValley SEO Content Engine.</p>
               </div>
@@ -298,9 +295,9 @@ export async function POST(request: Request) {
         // Update log
         if (logEntry) {
           await supabase
-            .from('seo_generation_log' as 'event_types')
-            .update({ status: 'email_sent' } as never)
-            .eq('id', logEntry.id as never);
+            .from('seo_generation_log' as any)
+            .update({ status: 'email_sent' })
+            .eq('id', logEntry.id);
         }
       } catch (emailError) {
         console.error('Failed to send email notification:', emailError);
@@ -313,22 +310,22 @@ export async function POST(request: Request) {
     // Update log with completion
     if (logEntry) {
       await supabase
-        .from('seo_generation_log' as 'event_types')
+        .from('seo_generation_log' as any)
         .update({
           status: 'completed',
           duration_ms: durationMs,
-        } as never)
-        .eq('id', logEntry.id as never);
+        })
+        .eq('id', logEntry.id);
     }
 
     return Response.json({
       success: true,
       generated: true,
-      itemId: item.id,
+      draftId,
       title: processedContent.title,
       slug: processedContent.slug,
       keyword: keyword.keyword,
-      adminUrl: `${appUrl}/admin/seo-engine/${item.id}`,
+      adminUrl: `${appUrl}/admin/seo-engine/drafts/${draftId}`,
       duration_ms: durationMs,
     });
   } catch (error) {
@@ -338,24 +335,24 @@ export async function POST(request: Request) {
 
     // Update keyword status to failed
     await supabase
-      .from('seo_keyword_queue' as 'event_types')
+      .from('seo_keyword_queue' as any)
       .update({
         status: 'failed',
         error_message: errorMessage,
         retry_count: (keyword.retry_count || 0) + 1,
-      } as never)
-      .eq('id', keyword.id as never);
+      })
+      .eq('id', keyword.id);
 
     // Update log
     if (logEntry) {
       await supabase
-        .from('seo_generation_log' as 'event_types')
+        .from('seo_generation_log' as any)
         .update({
           status: 'failed',
           error_message: errorMessage,
           duration_ms: durationMs,
-        } as never)
-        .eq('id', logEntry.id as never);
+        })
+        .eq('id', logEntry.id);
     }
 
     // Send error notification
