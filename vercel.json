@@ -11,6 +11,14 @@
     {
       "path": "/api/cron/lead-followup",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/seo-engine/cron/discover",
+      "schedule": "0 4 * * 1"
+    },
+    {
+      "path": "/api/seo-engine/cron/generate",
+      "schedule": "0 5 * * *"
     }
   ]
 }

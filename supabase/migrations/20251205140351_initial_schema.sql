@@ -531,3 +531,100 @@ CREATE POLICY "Service role full access seo_generated_images" ON seo_generated_i
 
 CREATE POLICY "Service role full access seo_performance_metrics" ON seo_performance_metrics
   FOR ALL TO service_role USING (true);
+
+-- ============================================
+-- SEO AUTO-GENERATION SYSTEM TABLES
+-- ============================================
+
+-- Keyword Queue (for automated daily content generation)
+CREATE TABLE seo_keyword_queue (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  keyword TEXT NOT NULL,
+  language TEXT NOT NULL DEFAULT 'nl' CHECK (language IN ('nl', 'en')),
+  priority INT NOT NULL DEFAULT 10, -- Lower = higher priority
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed', 'failed', 'skipped')),
+  scheduled_date DATE,
+  content_type TEXT DEFAULT 'long' CHECK (content_type IN ('short', 'long', 'mixed')),
+  metadata JSONB DEFAULT '{}', -- AI discovery data: category, trending_score, etc.
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  processed_at TIMESTAMPTZ,
+  webflow_item_id TEXT,
+  error_message TEXT,
+  retry_count INT DEFAULT 0,
+  created_by UUID REFERENCES auth.users(id),
+  UNIQUE(keyword, language)
+);
+
+-- Indexes for keyword queue
+CREATE INDEX idx_keyword_queue_status ON seo_keyword_queue(status);
+CREATE INDEX idx_keyword_queue_scheduled ON seo_keyword_queue(scheduled_date) WHERE status = 'pending';
+CREATE INDEX idx_keyword_queue_priority ON seo_keyword_queue(priority, created_at) WHERE status = 'pending';
+
+-- Generation Log (tracks each blog generation)
+CREATE TABLE seo_generation_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  keyword_queue_id UUID REFERENCES seo_keyword_queue(id) ON DELETE SET NULL,
+  webflow_item_id TEXT,
+  title TEXT,
+  slug TEXT,
+  status TEXT NOT NULL CHECK (status IN ('started', 'content_generated', 'saved_to_webflow', 'email_sent', 'completed', 'failed')),
+  duration_ms INT,
+  error_message TEXT,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_generation_log_keyword ON seo_generation_log(keyword_queue_id);
+CREATE INDEX idx_generation_log_created ON seo_generation_log(created_at DESC);
+CREATE INDEX idx_generation_log_status ON seo_generation_log(status);
+
+-- Discovery Log (tracks AI keyword discovery runs)
+CREATE TABLE seo_discovery_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  keywords_found INT NOT NULL DEFAULT 0,
+  keywords_added INT NOT NULL DEFAULT 0,
+  keywords_skipped INT NOT NULL DEFAULT 0,
+  summary TEXT,
+  raw_response JSONB,
+  search_queries_used JSONB,
+  news_sources_checked JSONB,
+  error_message TEXT,
+  duration_ms INT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_discovery_log_created ON seo_discovery_log(created_at DESC);
+
+-- Admin Notification Settings
+CREATE TABLE seo_notification_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  notify_on_generation BOOLEAN DEFAULT true,
+  notify_on_publish BOOLEAN DEFAULT true,
+  notify_on_error BOOLEAN DEFAULT true,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX idx_notification_email ON seo_notification_settings(email) WHERE is_active = true;
+
+-- RLS for auto-generation tables
+ALTER TABLE seo_keyword_queue ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seo_generation_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seo_discovery_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seo_notification_settings ENABLE ROW LEVEL SECURITY;
+
+-- Service role full access
+CREATE POLICY "Service role full access seo_keyword_queue" ON seo_keyword_queue
+  FOR ALL TO service_role USING (true);
+
+CREATE POLICY "Service role full access seo_generation_log" ON seo_generation_log
+  FOR ALL TO service_role USING (true);
+
+CREATE POLICY "Service role full access seo_discovery_log" ON seo_discovery_log
+  FOR ALL TO service_role USING (true);
+
+CREATE POLICY "Service role full access seo_notification_settings" ON seo_notification_settings
+  FOR ALL TO service_role USING (true);

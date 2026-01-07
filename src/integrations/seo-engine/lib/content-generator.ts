@@ -393,7 +393,7 @@ OUTPUT FORMAT:
         // Match acronym with optional suffixes like 'er, 'ers, -leeftijd
         // Capture groups: (acronym)(suffix)
         const regex = new RegExp(`\\b(${acronym})([''][a-z]*|-[a-z]+)?\\b`, 'gi');
-        normalized = normalized.replace(regex, (m, acr, suffix) => {
+        normalized = normalized.replace(regex, (_m: string, acr: string, suffix: string | undefined) => {
           return acr.toUpperCase() + (suffix || '');
         });
       }

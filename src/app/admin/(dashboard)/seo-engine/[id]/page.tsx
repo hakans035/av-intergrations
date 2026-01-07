@@ -26,7 +26,7 @@ async function getPost(id: string) {
     const item = await client.getItem(id)
     if (!item) return null
 
-    const fieldData = item.fieldData as Record<string, unknown>
+    const fieldData = item.fieldData as unknown as Record<string, unknown>
     return {
       id: item.id,
       title: fieldData['name'] as string || 'Untitled',

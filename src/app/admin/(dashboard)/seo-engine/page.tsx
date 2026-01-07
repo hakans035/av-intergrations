@@ -21,7 +21,7 @@ async function getWebflowPosts() {
 
     const response = await client.listItems({ limit: 100 })
     const posts = response.items.map((item) => {
-      const fieldData = item.fieldData as Record<string, unknown>
+      const fieldData = item.fieldData as unknown as Record<string, unknown>
       return {
         id: item.id,
         title: fieldData['name'] as string || 'Untitled',
@@ -74,15 +74,26 @@ export default async function SEOEnginePage() {
               Beheer en genereer blog posts voor Webflow
             </p>
           </div>
-          <a
-            href="/admin/seo-engine/generate"
-            className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-medium text-white transition-all duration-200 flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Nieuwe Post
-          </a>
+          <div className="flex gap-3">
+            <a
+              href="/admin/seo-engine/queue"
+              className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 rounded-xl text-sm font-medium text-purple-300 transition-all duration-200 flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              Keyword Queue
+            </a>
+            <a
+              href="/admin/seo-engine/generate"
+              className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-medium text-white transition-all duration-200 flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Nieuwe Post
+            </a>
+          </div>
         </div>
 
         {/* Stats Grid */}
