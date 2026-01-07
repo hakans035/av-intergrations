@@ -1,8 +1,9 @@
 /**
  * GET /api/seo-engine/keywords/queue
- * List queued keywords
+ * List queued keywords from database
  */
 
+import { createServiceClient } from '@/lib/supabase/server';
 import {
   validateAdminToken,
   unauthorizedResponse,
@@ -11,10 +12,8 @@ import {
   parseQueryParams,
   createRequestLogger,
 } from '../../_shared/utils';
-import type { Keyword, Language, KeywordStatus, KeywordIntent } from '@/integrations/seo-engine';
 
-// Mock data store - in production, use database
-const mockKeywords: Keyword[] = [];
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export async function GET(request: Request) {
   const logger = createRequestLogger('kw_queue');
@@ -30,37 +29,42 @@ export async function GET(request: Request) {
     const { page, limit, offset, params } = parseQueryParams(request.url);
 
     // Parse filters
-    const language = params.get('language') as Language | null;
-    const status = params.get('status') as KeywordStatus | null;
-    const intent = params.get('intent') as KeywordIntent | null;
+    const status = params.get('status');
 
-    logger.log('Query params', { page, limit, language, status, intent });
+    logger.log('Query params', { page, limit, status });
 
-    // Filter keywords
-    let filtered = [...mockKeywords];
+    const supabase = createServiceClient();
 
-    if (language) {
-      filtered = filtered.filter((k) => k.language === language);
-    }
+    // Build query
+    let query = supabase
+      .from('seo_keyword_queue' as any)
+      .select('*', { count: 'exact' });
+
+    // Filter by status if provided
     if (status) {
-      filtered = filtered.filter((k) => k.status === status);
-    }
-    if (intent) {
-      filtered = filtered.filter((k) => k.intent === intent);
+      query = query.eq('status', status);
     }
 
-    // Sort by volume descending
-    filtered.sort((a, b) => (b.volume ?? 0) - (a.volume ?? 0));
+    // Order by priority and created_at
+    query = query
+      .order('priority', { ascending: true })
+      .order('created_at', { ascending: true })
+      .range(offset, offset + limit - 1);
 
-    // Paginate
-    const total = filtered.length;
-    const keywords = filtered.slice(offset, offset + limit);
+    const { data: keywords, count, error } = await query;
 
-    logger.log('Returning keywords', { total, returned: keywords.length });
+    if (error) {
+      logger.error('Database error', error);
+      throw error;
+    }
+
+    const total = count || 0;
+
+    logger.log('Returning keywords', { total, returned: keywords?.length || 0 });
     logger.done('SUCCESS');
 
     return successResponse(
-      { keywords },
+      { keywords: keywords || [] },
       200,
       {
         total,
