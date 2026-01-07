@@ -81,7 +81,7 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
   return (
     <div style={styles.container}>
       <div style={styles.card} className="calculator-card">
-        <div className="calculator-grid">
+        <div style={styles.grid} className="calculator-grid">
           {/* Left Panel - Inputs */}
           <div style={styles.inputPanel} className="calculator-input-panel">
             <h3 style={styles.panelTitle} className="calculator-panel-title">
@@ -271,14 +271,14 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
                         <svg viewBox="0 0 300 180" style={styles.lineChartSvg}>
                           {/* Grid lines */}
                           {[0, 1, 2, 3, 4].map(i => (
-                            <line key={i} x1="50" y1={30 + i * 35} x2="290" y2={30 + i * 35} stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                            <line key={i} x1="50" y1={30 + i * 35} x2="290" y2={30 + i * 35} stroke="rgba(0,0,0,0.08)" strokeWidth="1" />
                           ))}
 
                           {/* Y-axis labels with euro amounts */}
                           {[0, 1, 2, 3, 4].map(i => {
                             const value = result.eindkapitaalNaDoorgroei * (1 - i * 0.25)
                             return (
-                              <text key={i} x="48" y={33 + i * 35} fill="rgba(191,219,254,0.6)" fontSize="7" textAnchor="end">
+                              <text key={i} x="48" y={33 + i * 35} fill="#94a3b8" fontSize="7" textAnchor="end">
                                 €{Math.round(value).toLocaleString('nl-NL')}
                               </text>
                             )
@@ -291,7 +291,7 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
                               y1="30"
                               x2={50 + (inlegPeriodeJaar / result.totaleLooptijdJaar) * 240}
                               y2="170"
-                              stroke="rgba(255,255,255,0.2)"
+                              stroke="rgba(0,0,0,0.15)"
                               strokeWidth="1"
                               strokeDasharray="2,2"
                             />
@@ -304,7 +304,7 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
                               const y = 170 - (d.kapitaal / result.eindkapitaalNaDoorgroei) * 140
                               return `L${x},${y}`
                             }).join(' ')} L290,170 Z`}
-                            fill="rgba(134, 239, 172, 0.15)"
+                            fill="rgba(34, 197, 94, 0.1)"
                           />
 
                           {/* Sparen line (dashed) */}
@@ -315,7 +315,7 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
                               return `L${x},${y}`
                             }).join(' ')}`}
                             fill="none"
-                            stroke="rgba(255,255,255,0.4)"
+                            stroke="#94a3b8"
                             strokeWidth="2"
                             strokeDasharray="4,4"
                           />
@@ -328,7 +328,7 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
                               return `L${x},${y}`
                             }).join(' ')}`}
                             fill="none"
-                            stroke="#86efac"
+                            stroke="#22c55e"
                             strokeWidth="2.5"
                           />
 
@@ -358,7 +358,7 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
                                 cx={50 + (hoveredPoint / (result.jaarData.length - 1)) * 240}
                                 cy={170 - (result.jaarData[hoveredPoint].kapitaal / result.eindkapitaalNaDoorgroei) * 140}
                                 r="5"
-                                fill="#86efac"
+                                fill="#22c55e"
                                 stroke="#fff"
                                 strokeWidth="2"
                               />
@@ -366,7 +366,7 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
                                 cx={50 + (hoveredPoint / (result.jaarData.length - 1)) * 240}
                                 cy={170 - (result.jaarData[hoveredPoint].waardeSparen / result.eindkapitaalNaDoorgroei) * 140}
                                 r="4"
-                                fill="#fff"
+                                fill="#94a3b8"
                                 stroke="#fff"
                                 strokeWidth="1"
                               />
@@ -374,11 +374,11 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
                           )}
 
                           {/* X-axis labels */}
-                          <text x="50" y="180" fill="rgba(191,219,254,0.6)" fontSize="8" textAnchor="middle">0</text>
+                          <text x="50" y="180" fill="#94a3b8" fontSize="8" textAnchor="middle">0</text>
                           {doorgroeiPeriodeJaar > 0 && (
-                            <text x={50 + (inlegPeriodeJaar / result.totaleLooptijdJaar) * 240} y="180" fill="rgba(134,239,172,0.8)" fontSize="8" textAnchor="middle">{inlegPeriodeJaar}jr</text>
+                            <text x={50 + (inlegPeriodeJaar / result.totaleLooptijdJaar) * 240} y="180" fill="#22c55e" fontSize="8" textAnchor="middle">{inlegPeriodeJaar}jr</text>
                           )}
-                          <text x="290" y="180" fill="rgba(191,219,254,0.6)" fontSize="8" textAnchor="middle">{result.totaleLooptijdJaar}jr</text>
+                          <text x="290" y="180" fill="#94a3b8" fontSize="8" textAnchor="middle">{result.totaleLooptijdJaar}jr</text>
                         </svg>
 
                         {/* Tooltip */}
@@ -392,7 +392,7 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
                               <span style={{
                                 ...styles.tooltipPhase,
                                 backgroundColor: result.jaarData[hoveredPoint].fase === 'doorgroei' ? 'rgba(134,239,172,0.2)' : 'rgba(191,219,254,0.2)',
-                                color: result.jaarData[hoveredPoint].fase === 'doorgroei' ? '#86efac' : 'rgba(191,219,254,1)',
+                                color: result.jaarData[hoveredPoint].fase === 'doorgroei' ? '#22c55e' : '#64748b',
                               }}>
                                 {result.jaarData[hoveredPoint].fase === 'doorgroei' ? 'Doorgroei' : 'Opbouw'}
                               </span>
@@ -415,7 +415,7 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
 
                       <div style={styles.chartLegend} className="calculator-chart-legend">
                         <div style={styles.legendItem}>
-                          <div style={{ ...styles.legendLine, backgroundColor: '#86efac' }} />
+                          <div style={{ ...styles.legendLine, backgroundColor: '#22c55e' }} />
                           <span>Beleggen</span>
                         </div>
                         <div style={styles.legendItem}>
@@ -447,7 +447,7 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
                               <tr key={row.jaar} style={styles.tr}>
                                 <td style={{
                                   ...styles.td,
-                                  color: row.fase === 'doorgroei' ? '#86efac' : undefined,
+                                  color: row.fase === 'doorgroei' ? '#22c55e' : undefined,
                                 }}>
                                   {new Date().getFullYear() + row.jaar - 1}
                                   {row.fase === 'doorgroei' && <span style={styles.faseTag}>D</span>}
@@ -455,7 +455,7 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
                                 <td style={{ ...styles.td, textAlign: 'right', opacity: 0.8 }}>
                                   {formatCurrency(row.totaleInleg, 'nl-NL', 'EUR')}
                                 </td>
-                                <td style={{ ...styles.td, textAlign: 'right', color: '#86efac' }}>
+                                <td style={{ ...styles.td, textAlign: 'right', color: '#22c55e' }}>
                                   +{formatCurrency(row.rendement, 'nl-NL', 'EUR')}
                                 </td>
                                 <td style={{ ...styles.td, textAlign: 'right', fontWeight: 500 }}>
@@ -517,15 +517,21 @@ const styles: Record<string, React.CSSProperties> = {
     width: '100%',
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: 'transparent',
     borderRadius: '24px',
-    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.1)',
-    border: '1px solid #e5e7eb',
     overflow: 'hidden',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '32px',
   },
   inputPanel: {
     padding: '32px',
     backgroundColor: '#ffffff',
+    borderRadius: '16px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+    border: '1px solid #e5e7eb',
   },
   panelTitle: {
     fontSize: '20px',
@@ -553,35 +559,24 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.5,
   },
   resultPanel: {
-    backgroundColor: '#307cf1',
+    backgroundColor: '#ffffff',
     padding: '32px',
-    color: '#ffffff',
+    color: '#0f172a',
     position: 'relative',
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
     minHeight: '650px',
+    borderRadius: '16px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+    border: '1px solid #e5e7eb',
   },
   decorCircle1: {
-    position: 'absolute',
-    right: '-40px',
-    top: '-40px',
-    width: '160px',
-    height: '160px',
-    borderRadius: '50%',
-    backgroundColor: 'rgba(59, 130, 246, 0.5)',
-    filter: 'blur(40px)',
+    display: 'none',
   },
   decorCircle2: {
-    position: 'absolute',
-    left: '0',
-    bottom: '0',
-    width: '128px',
-    height: '128px',
-    borderRadius: '50%',
-    backgroundColor: 'rgba(96, 165, 250, 0.3)',
-    filter: 'blur(40px)',
+    display: 'none',
   },
   resultContent: {
     position: 'relative',
@@ -593,17 +588,17 @@ const styles: Record<string, React.CSSProperties> = {
   viewSwitcher: {
     display: 'flex',
     padding: '4px',
-    backgroundColor: 'rgba(30, 58, 138, 0.4)',
+    backgroundColor: '#f1f5f9',
     borderRadius: '8px',
     marginBottom: '24px',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    border: '1px solid #e2e8f0',
   },
   viewButton: {
     flex: 1,
     padding: '8px 12px',
     fontSize: '12px',
     fontWeight: 500,
-    color: 'rgba(191, 219, 254, 1)',
+    color: '#64748b',
     backgroundColor: 'transparent',
     border: 'none',
     borderRadius: '6px',
@@ -611,8 +606,8 @@ const styles: Record<string, React.CSSProperties> = {
     transition: 'all 0.2s',
   },
   viewButtonActive: {
-    backgroundColor: '#ffffff',
-    color: '#307cf1',
+    backgroundColor: '#307cf1',
+    color: '#ffffff',
     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
   },
   viewContent: {
@@ -625,7 +620,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   resultLabel: {
     fontSize: '14px',
-    color: 'rgba(191, 219, 254, 1)',
+    color: '#64748b',
     marginBottom: '4px',
   },
   resultValue: {
@@ -633,6 +628,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
     letterSpacing: '-0.02em',
     lineHeight: 1.2,
+    color: '#307cf1',
   },
   resultTrend: {
     marginTop: '8px',
@@ -640,10 +636,10 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: '8px',
     fontSize: '14px',
-    color: 'rgba(191, 219, 254, 1)',
+    color: '#22c55e',
   },
   phaseSection: {
-    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+    borderTop: '1px solid #e2e8f0',
     paddingTop: '14px',
     marginTop: '14px',
     display: 'flex',
@@ -653,13 +649,13 @@ const styles: Record<string, React.CSSProperties> = {
   phaseTitle: {
     fontSize: '11px',
     fontWeight: 600,
-    color: 'rgba(191, 219, 254, 0.8)',
+    color: '#64748b',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
     marginBottom: '4px',
   },
   totalSection: {
-    borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+    borderTop: '1px solid #e2e8f0',
     paddingTop: '14px',
     marginTop: '14px',
   },
@@ -669,22 +665,24 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
   },
   resultRowLabel: {
-    color: 'rgba(191, 219, 254, 1)',
+    color: '#64748b',
     fontSize: '13px',
   },
   resultRowValue: {
     fontWeight: 500,
     fontSize: '14px',
+    color: '#0f172a',
   },
   resultRowValueGreen: {
     fontWeight: 500,
     fontSize: '14px',
-    color: '#86efac',
+    color: '#22c55e',
   },
   resultRowValueBadge: {
     fontWeight: 600,
     fontSize: '13px',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#dcfce7',
+    color: '#22c55e',
     padding: '4px 10px',
     borderRadius: '4px',
   },
@@ -692,12 +690,12 @@ const styles: Record<string, React.CSSProperties> = {
   chartTitle: {
     fontSize: '18px',
     fontWeight: 500,
-    color: 'rgba(191, 219, 254, 1)',
+    color: '#0f172a',
     marginBottom: '4px',
   },
   chartSubtitle: {
     fontSize: '12px',
-    color: 'rgba(191, 219, 254, 0.7)',
+    color: '#64748b',
     marginBottom: '24px',
   },
   chartContainer: {
@@ -741,6 +739,7 @@ const styles: Record<string, React.CSSProperties> = {
   barLabel: {
     fontSize: '12px',
     fontWeight: 500,
+    color: '#64748b',
   },
   chartLegend: {
     display: 'flex',
@@ -750,7 +749,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '11px',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
-    color: 'rgba(191, 219, 254, 0.8)',
+    color: '#64748b',
   },
   legendItem: {
     display: 'flex',
@@ -782,7 +781,7 @@ const styles: Record<string, React.CSSProperties> = {
   legendLineDashed: {
     width: '20px',
     height: '3px',
-    background: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.6) 4px, transparent 4px, transparent 8px)',
+    background: 'repeating-linear-gradient(90deg, #94a3b8, #94a3b8 4px, transparent 4px, transparent 8px)',
   },
   // Tooltip styles
   tooltip: {
@@ -802,7 +801,7 @@ const styles: Record<string, React.CSSProperties> = {
   tooltipTitle: {
     fontWeight: 600,
     marginBottom: '8px',
-    color: 'rgba(191, 219, 254, 1)',
+    color: '#bfdbfe',
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
@@ -823,13 +822,13 @@ const styles: Record<string, React.CSSProperties> = {
     width: '8px',
     height: '8px',
     borderRadius: '50%',
-    backgroundColor: '#86efac',
+    backgroundColor: '#22c55e',
   },
   tooltipDotWhite: {
     width: '8px',
     height: '8px',
     borderRadius: '50%',
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    backgroundColor: '#94a3b8',
   },
   tooltipDivider: {
     height: '1px',
@@ -837,7 +836,7 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '6px 0',
   },
   tooltipDiff: {
-    color: '#86efac',
+    color: '#22c55e',
     fontWeight: 600,
   },
   // Table styles
@@ -858,30 +857,30 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '8px 0',
     fontSize: '11px',
     fontWeight: 500,
-    color: 'rgba(191, 219, 254, 0.8)',
+    color: '#64748b',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+    borderBottom: '1px solid #e2e8f0',
     position: 'sticky',
     top: 0,
-    backgroundColor: '#307cf1',
+    backgroundColor: '#ffffff',
     textAlign: 'left',
     zIndex: 10,
   },
   tr: {
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+    borderBottom: '1px solid #f1f5f9',
   },
   td: {
     padding: '10px 0',
-    color: 'rgba(239, 246, 255, 0.95)',
+    color: '#0f172a',
   },
   faseTag: {
     marginLeft: '6px',
     fontSize: '9px',
     padding: '2px 4px',
-    backgroundColor: 'rgba(134, 239, 172, 0.2)',
+    backgroundColor: '#dcfce7',
     borderRadius: '3px',
-    color: '#86efac',
+    color: '#22c55e',
     fontWeight: 600,
   },
   tableLegend: {
@@ -890,7 +889,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '6px',
     marginTop: '12px',
     fontSize: '11px',
-    color: 'rgba(191, 219, 254, 0.7)',
+    color: '#64748b',
   },
   ctaSection: {
     position: 'relative',
@@ -900,9 +899,9 @@ const styles: Record<string, React.CSSProperties> = {
   ctaButton: {
     width: '100%',
     padding: '16px 28px',
-    backgroundColor: 'transparent',
+    backgroundColor: '#307cf1',
     color: '#ffffff',
-    border: '1px solid #ffffff',
+    border: '1px solid #307cf1',
     borderRadius: '100px',
     fontSize: '18px',
     fontWeight: 400,
@@ -915,10 +914,10 @@ const styles: Record<string, React.CSSProperties> = {
   reportLink: {
     marginTop: '16px',
     padding: '12px 24px',
-    background: 'rgba(255, 255, 255, 0.15)',
-    border: '1px solid rgba(255, 255, 255, 0.4)',
+    background: 'transparent',
+    border: '1px solid #307cf1',
     borderRadius: '100px',
-    color: '#ffffff',
+    color: '#307cf1',
     fontSize: '14px',
     fontWeight: 500,
     textDecoration: 'none',
@@ -933,6 +932,6 @@ const styles: Record<string, React.CSSProperties> = {
     marginTop: '12px',
     textAlign: 'center',
     fontSize: '12px',
-    color: 'rgba(191, 219, 254, 0.7)',
+    color: '#94a3b8',
   },
 }
