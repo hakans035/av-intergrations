@@ -56,7 +56,10 @@ export const contentConfig = {
   /** SEO constraints */
   seo: {
     titleMaxLength: 60,
+    /** Meta description for Google (can be up to 160) */
     descriptionMaxLength: 160,
+    /** Post summary - STRICT LIMIT: 140 characters maximum, NEVER exceed this! */
+    summaryMaxLength: 140,
     slugMaxLength: 75,
     altTextMaxLength: 125,
     minH2Headings: 2,

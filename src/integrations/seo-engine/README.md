@@ -20,20 +20,26 @@ The integration is part of the main application. No additional installation requ
 
 ## Environment Variables
 
-Required environment variables:
+Required environment variables in `.env.local`:
 
 ```bash
+# API Authentication
+ADMIN_API_TOKEN=your-secure-admin-token      # For API route authentication
+
 # Webflow CMS API
-WEBFLOW_API_TOKEN=your-webflow-api-token
-WEBFLOW_SITE_ID=your-site-id
-WEBFLOW_COLLECTION_ID=your-blog-posts-collection-id
+WEBFLOW_API_TOKEN=your-webflow-api-token     # Webflow API v2 token
+WEBFLOW_SITE_ID=your-site-id                 # Webflow site ID
+WEBFLOW_COLLECTION_ID=your-collection-id    # Blog posts collection ID
+WEBFLOW_WEBHOOK_SECRET=your-webhook-secret   # Optional: webhook signature verification
 
 # Gemini API (for image generation)
-GEMINI_API_KEY=your-gemini-api-key
+GEMINI_API_KEY=your-gemini-api-key           # Google AI Studio API key
 
-# Google Search Console (for performance monitoring)
-GOOGLE_SEARCH_CONSOLE_CREDENTIALS=path-to-credentials.json
+# Supabase (already configured)
+# NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 ```
+
+**For detailed setup instructions, see: `docs/seo-engine-setup.md`**
 
 ## Usage
 
@@ -130,8 +136,29 @@ Content goes through three approval gates:
 2. **Compliance Officer** - Reviews disclaimers, prohibited claims
 3. **Publishing Manager** - Final approval before publish
 
+## API Routes
+
+All routes require Bearer token authentication: `Authorization: Bearer <ADMIN_API_TOKEN>`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/seo-engine/keywords/discover` | Discover new keywords |
+| GET | `/api/seo-engine/keywords/queue` | List queued keywords |
+| PATCH | `/api/seo-engine/keywords/[id]` | Update keyword status |
+| POST | `/api/seo-engine/content/generate` | Generate content prompt |
+| GET | `/api/seo-engine/content/drafts` | List content drafts |
+| GET/PATCH | `/api/seo-engine/content/[id]` | Get/update a draft |
+| POST | `/api/seo-engine/content/[id]/publish` | Publish to Webflow |
+| GET | `/api/seo-engine/approval/pending` | List pending approvals |
+| POST | `/api/seo-engine/approval/[id]` | Submit approval decision |
+| POST | `/api/seo-engine/images/generate` | Generate image with Gemini |
+| GET | `/api/seo-engine/performance/metrics` | Get performance metrics |
+| POST | `/api/seo-engine/performance/sync` | Sync performance data |
+| POST | `/api/seo-engine/webhooks/webflow` | Webflow webhook handler |
+
 ## Related Documentation
 
+- **Setup Guide**: `docs/seo-engine-setup.md`
 - Full specification: `docs/seo-content-engine-requirements.md`
 - Task breakdown: `docs/tasks/seo-engine/`
 - CMS setup script: `scripts/webflow-cms-setup.ts`

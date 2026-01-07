@@ -382,32 +382,83 @@ export class WebflowClient {
   // Assets
   // ===========================================================================
 
+  /**
+   * Upload an asset to Webflow using the two-step process:
+   * 1. Create asset metadata (POST /sites/:site_id/assets with fileName + fileHash)
+   * 2. Upload file to S3 using the returned uploadUrl and uploadDetails
+   *
+   * Docs: https://developers.webflow.com/data/reference/assets/assets/create
+   */
   async uploadAsset(
     file: WebflowAssetUpload,
     siteId?: string
   ): Promise<WebflowAsset> {
     const id = siteId ?? this.config.siteId;
 
-    // Create form data
-    const formData = new FormData();
-    let blob: Blob;
+    // Get file data as Buffer
+    let fileBuffer: Buffer;
     if (file.fileData instanceof Blob) {
-      blob = file.fileData;
+      const arrayBuffer = await file.fileData.arrayBuffer();
+      fileBuffer = Buffer.from(arrayBuffer);
     } else {
-      // Handle Buffer by converting to Uint8Array first
-      const uint8Array = new Uint8Array(file.fileData);
-      blob = new Blob([uint8Array]);
-    }
-    formData.append('file', blob, file.fileName);
-    if (file.parentFolder) {
-      formData.append('parentFolder', file.parentFolder);
+      fileBuffer = Buffer.from(file.fileData);
     }
 
-    return this.requestFormData<WebflowAsset>(
-      'POST',
-      `/sites/${id}/assets`,
-      formData
-    );
+    // Calculate MD5 hash of the file
+    const crypto = await import('crypto');
+    const fileHash = crypto.createHash('md5').update(fileBuffer).digest('hex');
+
+    // Step 1: Create asset metadata
+    const createResponse = await this.request<{
+      uploadUrl: string;
+      uploadDetails: Record<string, string | null>;
+      id: string;
+      hostedUrl: string;
+      contentType: string;
+      originalFileName: string;
+    }>('POST', `/sites/${id}/assets`, {
+      fileName: file.fileName,
+      fileHash: fileHash,
+      ...(file.parentFolder && { parentFolder: file.parentFolder }),
+    });
+
+    // Step 2: Upload to S3 using uploadDetails
+    const formData = new FormData();
+
+    // Add all uploadDetails fields to the form
+    for (const [key, value] of Object.entries(createResponse.uploadDetails)) {
+      if (value !== null) {
+        formData.append(key, value);
+      }
+    }
+
+    // Add the actual file last (required by S3)
+    const blob = new Blob([fileBuffer], { type: createResponse.contentType || 'application/octet-stream' });
+    formData.append('file', blob, file.fileName);
+
+    // Upload to S3
+    const s3Response = await fetch(createResponse.uploadUrl, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!s3Response.ok) {
+      const errorText = await s3Response.text();
+      throw new WebflowApiError(
+        `S3 upload failed: ${errorText}`,
+        'S3_UPLOAD_ERROR',
+        s3Response.status
+      );
+    }
+
+    // Return the asset info
+    return {
+      id: createResponse.id,
+      url: createResponse.hostedUrl,
+      mimeType: createResponse.contentType,
+      size: fileBuffer.length,
+      createdOn: new Date().toISOString(),
+    };
   }
 
   async getAsset(assetId: string): Promise<WebflowAsset | null> {

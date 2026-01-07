@@ -138,6 +138,7 @@ export {
 // =============================================================================
 
 export {
+  // Webflow API Client
   WebflowClient,
   WebflowApiError,
   createWebflowClient,
@@ -157,6 +158,87 @@ export {
   type WebflowError,
   type WebflowApiLog,
   type WebflowWebhookPayload,
+  // Keyword Discovery
+  KeywordDiscoveryService,
+  ManualKeywordSource,
+  GoogleTrendsSource,
+  createKeywordDiscoveryService,
+  classifyIntent,
+  type KeywordDiscoverySource,
+  type DiscoveryOptions,
+  type DiscoveredKeyword,
+  type KeywordWithIntent,
+  type KeywordRecord,
+  type KeywordDiscoveryResult,
+  // Content Generator
+  ContentGeneratorService,
+  createContentGenerator,
+  type ContentGenerationOptions,
+  type GeneratedContent,
+  type FAQ,
+  type ContentLink,
+  type ContentValidationResult,
+  type HeadingStructure,
+  type ReadabilityScore,
+  type ContentPrompt,
+  // Image Generator
+  ImageGeneratorService,
+  createImageGenerator,
+  createImageGeneratorWithWebflow,
+  type ImageGenerationOptions,
+  type ImageGenOutput,
+  type UploadedImage,
+  type ImageGenerationResult,
+  // Compliance Checker
+  ComplianceCheckerService,
+  createComplianceChecker,
+  type ComplianceCheckOptions,
+  // SEO Validator
+  SEOValidatorService,
+  createSEOValidator,
+  type SEOValidationOptions,
+  type SEOContent,
+  // Quality Assurance
+  QualityAssuranceService,
+  createQualityAssurance,
+  type QACheckOptions,
+  type ContentForQA,
+  type LinkValidationResult,
+  type LanguageCheckResult,
+  type PlagiarismResult,
+  // Approval Workflow
+  ApprovalWorkflowService,
+  createApprovalWorkflow,
+  type Reviewer,
+  type ApprovalRequest,
+  type ApprovalResult,
+  type WorkflowState,
+  type StateTransition,
+  // Publishing Workflow
+  PublishingWorkflowService,
+  createPublishingWorkflow,
+  type WorkflowStep,
+  type WorkflowItem,
+  type RevisionEntry,
+  type WorkflowResult,
+  type GeneratedDraftData,
+  type WebflowSaveResult,
+  type PublishResult,
+  // Performance Monitoring
+  PerformanceMonitoringService,
+  createPerformanceMonitoring,
+  createMockSearchConsoleSource,
+  createMockAnalyticsSource,
+  type ReviewCadence,
+  type UpdateTriggerReason,
+  type UpdateTrigger,
+  type ContentVersion,
+  type VersionHistory,
+  type PerformanceSummary,
+  type ReviewReport,
+  type SearchConsoleData,
+  type AnalyticsData,
+  type DataSource,
 } from './lib';
 
 // =============================================================================
@@ -166,7 +248,25 @@ export {
 // export * from './hooks';
 
 // =============================================================================
-// Components (to be implemented)
+// Components
 // =============================================================================
 
-// export * from './components';
+export {
+  // Shared Components
+  StatusBadge,
+  LanguageSelector,
+  ActionButton,
+  MetricCard,
+  LoadingState,
+  LoadingSkeleton,
+  TableLoadingSkeleton,
+  ErrorState,
+  EmptyState,
+  ReviewerSelect,
+  // Main Components
+  KeywordQueue,
+  ContentEditor,
+  ApprovalWorkflow,
+  QAChecklist,
+  PerformanceDashboard,
+} from './components';

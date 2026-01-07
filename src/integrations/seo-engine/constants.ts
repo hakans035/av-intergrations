@@ -21,6 +21,28 @@ export const POST_DISCLAIMER = {
 } as const;
 
 // =============================================================================
+// Dutch Acronyms
+// =============================================================================
+
+/**
+ * Dutch acronyms that should always be written in UPPERCASE.
+ * Used for normalizing headers and titles to correct Dutch formatting.
+ */
+export const DUTCH_ACRONYMS = [
+  'zzp',   // Zelfstandige Zonder Personeel
+  'aow',   // Algemene Ouderdomswet
+  'for',   // Fiscale Oudedagsreserve
+  'btw',   // Belasting Toegevoegde Waarde
+  'bv',    // Besloten Vennootschap
+  'ib',    // Inkomstenbelasting
+  'kvk',   // Kamer van Koophandel
+  'uwv',   // Uitvoeringsinstituut Werknemersverzekeringen
+  'wtp',   // Wet Toekomst Pensioenen
+  'dga',   // Directeur-Grootaandeelhouder
+  'vpb',   // Vennootschapsbelasting
+] as const;
+
+// =============================================================================
 // Prohibited Claims Patterns
 // =============================================================================
 

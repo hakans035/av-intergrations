@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
@@ -27,7 +28,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-8">
-            <a href="/admin">
+            <Link href="/admin">
               <Image
                 src="/av-logo-white.png"
                 alt="Ambition Valley"
@@ -36,9 +37,9 @@ export function AdminHeader({ user }: AdminHeaderProps) {
                 className="h-7 md:h-8 w-auto"
                 priority
               />
-            </a>
+            </Link>
             <nav className="hidden md:flex items-center gap-2">
-              <a
+              <Link
                 href="/admin"
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive('/admin')
@@ -47,8 +48,8 @@ export function AdminHeader({ user }: AdminHeaderProps) {
                 }`}
               >
                 Dashboard
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/admin/results"
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive('/admin/results')
@@ -57,8 +58,8 @@ export function AdminHeader({ user }: AdminHeaderProps) {
                 }`}
               >
                 Results
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/admin/submissions"
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive('/admin/submissions')
@@ -67,8 +68,8 @@ export function AdminHeader({ user }: AdminHeaderProps) {
                 }`}
               >
                 Inzendingen
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/admin/booking"
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   pathname.startsWith('/admin/booking')
@@ -77,8 +78,8 @@ export function AdminHeader({ user }: AdminHeaderProps) {
                 }`}
               >
                 Boekingen
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/admin/email-workflows"
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   pathname.startsWith('/admin/email')
@@ -87,7 +88,17 @@ export function AdminHeader({ user }: AdminHeaderProps) {
                 }`}
               >
                 E-mail
-              </a>
+              </Link>
+              <Link
+                href="/admin/seo-engine"
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  pathname.startsWith('/admin/seo-engine')
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                SEO Content
+              </Link>
             </nav>
           </div>
 

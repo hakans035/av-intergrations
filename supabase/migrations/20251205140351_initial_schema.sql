@@ -378,3 +378,156 @@ ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
 -- Service role full access
 CREATE POLICY "Service role full access invoices" ON invoices
   FOR ALL TO service_role USING (true);
+
+-- ============================================
+-- SEO CONTENT ENGINE TABLES
+-- ============================================
+
+-- Keywords table (keyword discovery queue)
+CREATE TABLE seo_keywords (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  keyword TEXT NOT NULL,
+  language TEXT NOT NULL CHECK (language IN ('nl', 'en')),
+  intent TEXT NOT NULL CHECK (intent IN ('informational', 'transactional', 'local')),
+  volume INTEGER DEFAULT 0,
+  difficulty NUMERIC(5,2) DEFAULT 0 CHECK (difficulty >= 0 AND difficulty <= 100),
+  discovered_at TIMESTAMPTZ DEFAULT NOW(),
+  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'approved', 'in_progress', 'used', 'rejected', 'expired')),
+  last_used TIMESTAMPTZ,
+  source TEXT, -- e.g., 'google_trends', 'search_console', 'manual'
+  source_data JSONB, -- raw data from source
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(keyword, language)
+);
+
+-- Content drafts table
+CREATE TABLE seo_content_drafts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  keyword_id UUID REFERENCES seo_keywords(id) ON DELETE SET NULL,
+  keyword TEXT NOT NULL,
+  language TEXT NOT NULL CHECK (language IN ('nl', 'en')),
+  content_type TEXT NOT NULL CHECK (content_type IN ('short', 'long', 'mixed')),
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  body TEXT NOT NULL,
+  summary TEXT,
+  meta_title TEXT,
+  meta_description TEXT,
+  schema_type TEXT CHECK (schema_type IN ('article', 'faqpage', 'article-faq')),
+  status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'pending_review', 'approved', 'published', 'archived')),
+  webflow_item_id TEXT,
+  current_gate TEXT CHECK (current_gate IN ('content_editor', 'compliance_officer', 'publishing_manager')),
+  revision_count INTEGER DEFAULT 0,
+  generated_at TIMESTAMPTZ DEFAULT NOW(),
+  published_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(slug, language)
+);
+
+-- Content revisions table (version history)
+CREATE TABLE seo_content_revisions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  draft_id UUID REFERENCES seo_content_drafts(id) ON DELETE CASCADE,
+  version TEXT NOT NULL, -- e.g., 'v1.0', 'v1.1'
+  changes TEXT NOT NULL, -- description of changes
+  previous_body TEXT, -- snapshot of previous body
+  changed_by TEXT NOT NULL,
+  changed_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Approval logs table (audit trail)
+CREATE TABLE seo_approval_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  draft_id UUID REFERENCES seo_content_drafts(id) ON DELETE CASCADE,
+  gate TEXT NOT NULL CHECK (gate IN ('content_editor', 'compliance_officer', 'publishing_manager')),
+  action TEXT NOT NULL CHECK (action IN ('approve', 'reject', 'request_revision', 'flag_for_legal')),
+  reviewer_id TEXT NOT NULL,
+  reviewer_name TEXT NOT NULL,
+  notes TEXT,
+  previous_status TEXT NOT NULL,
+  new_status TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Generated images table
+CREATE TABLE seo_generated_images (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  draft_id UUID REFERENCES seo_content_drafts(id) ON DELETE CASCADE,
+  category TEXT NOT NULL CHECK (category IN ('hero', 'thumbnail', 'infographic')),
+  url TEXT NOT NULL,
+  alt_text TEXT,
+  width INTEGER,
+  height INTEGER,
+  file_size_bytes INTEGER,
+  webflow_asset_id TEXT,
+  generated_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Performance metrics table
+CREATE TABLE seo_performance_metrics (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  draft_id UUID REFERENCES seo_content_drafts(id) ON DELETE CASCADE,
+  webflow_item_id TEXT,
+  date DATE NOT NULL,
+  impressions INTEGER DEFAULT 0,
+  clicks INTEGER DEFAULT 0,
+  position NUMERIC(5,2) DEFAULT 0,
+  ctr NUMERIC(5,2) DEFAULT 0,
+  page_views INTEGER DEFAULT 0,
+  time_on_page_seconds INTEGER DEFAULT 0,
+  bounce_rate NUMERIC(5,2) DEFAULT 0,
+  scroll_depth NUMERIC(5,2) DEFAULT 0,
+  conversions INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(draft_id, date)
+);
+
+-- SEO Engine Indexes
+CREATE INDEX idx_seo_keywords_language ON seo_keywords(language);
+CREATE INDEX idx_seo_keywords_status ON seo_keywords(status);
+CREATE INDEX idx_seo_keywords_intent ON seo_keywords(intent);
+CREATE INDEX idx_seo_keywords_discovered ON seo_keywords(discovered_at);
+CREATE INDEX idx_seo_keywords_keyword ON seo_keywords(keyword);
+
+CREATE INDEX idx_seo_drafts_keyword ON seo_content_drafts(keyword_id);
+CREATE INDEX idx_seo_drafts_status ON seo_content_drafts(status);
+CREATE INDEX idx_seo_drafts_language ON seo_content_drafts(language);
+CREATE INDEX idx_seo_drafts_slug ON seo_content_drafts(slug);
+CREATE INDEX idx_seo_drafts_webflow ON seo_content_drafts(webflow_item_id);
+
+CREATE INDEX idx_seo_revisions_draft ON seo_content_revisions(draft_id);
+CREATE INDEX idx_seo_approval_draft ON seo_approval_logs(draft_id);
+CREATE INDEX idx_seo_approval_gate ON seo_approval_logs(gate);
+CREATE INDEX idx_seo_images_draft ON seo_generated_images(draft_id);
+CREATE INDEX idx_seo_metrics_draft ON seo_performance_metrics(draft_id);
+CREATE INDEX idx_seo_metrics_date ON seo_performance_metrics(date);
+
+-- SEO Engine RLS
+ALTER TABLE seo_keywords ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seo_content_drafts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seo_content_revisions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seo_approval_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seo_generated_images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seo_performance_metrics ENABLE ROW LEVEL SECURITY;
+
+-- Service role full access for SEO tables
+CREATE POLICY "Service role full access seo_keywords" ON seo_keywords
+  FOR ALL TO service_role USING (true);
+
+CREATE POLICY "Service role full access seo_content_drafts" ON seo_content_drafts
+  FOR ALL TO service_role USING (true);
+
+CREATE POLICY "Service role full access seo_content_revisions" ON seo_content_revisions
+  FOR ALL TO service_role USING (true);
+
+CREATE POLICY "Service role full access seo_approval_logs" ON seo_approval_logs
+  FOR ALL TO service_role USING (true);
+
+CREATE POLICY "Service role full access seo_generated_images" ON seo_generated_images
+  FOR ALL TO service_role USING (true);
+
+CREATE POLICY "Service role full access seo_performance_metrics" ON seo_performance_metrics
+  FOR ALL TO service_role USING (true);
