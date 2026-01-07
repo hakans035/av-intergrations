@@ -98,9 +98,26 @@ export async function POST(request: Request) {
 
   const supabase = createServiceClient();
 
-  // Get next pending keyword from queue
   const today = new Date().toISOString().split('T')[0];
 
+  // Check if we already generated content today (limit: 1 per day)
+  const { count: todayCount } = await supabase
+    .from('seo_keyword_queue' as 'event_types')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'completed')
+    .gte('processed_at', `${today}T00:00:00Z`)
+    .lt('processed_at', `${today}T23:59:59Z`);
+
+  if (todayCount && todayCount >= 1) {
+    return Response.json({
+      success: true,
+      message: 'Daily limit reached (1 post per day)',
+      generated: false,
+      todayCount,
+    });
+  }
+
+  // Get next pending keyword from queue
   // Direct query (no RPC needed)
   const result = await supabase
     .from('seo_keyword_queue' as 'event_types')
