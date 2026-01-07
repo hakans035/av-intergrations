@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
 import { StatsCard } from '@/components/admin/StatsCard'
 import { TriggerDiscoveryButton } from './TriggerDiscoveryButton'
 import { TriggerGenerateButton } from './TriggerGenerateButton'
@@ -39,7 +39,7 @@ interface DiscoveryLogItem {
 }
 
 async function getQueueData() {
-  const supabase = await createClient()
+  const supabase = createServiceClient()
 
   // Get queue items (use 'as any' until migration is run and types are regenerated)
   const { data: queueItems } = await supabase
