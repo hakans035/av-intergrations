@@ -30,7 +30,6 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
 
   useEffect(() => {
     if (risicoProfiel !== 'custom') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync derived state with profile
       setBeleggingsRendement(RISICO_PROFIELEN[risicoProfiel].rendement)
     }
   }, [risicoProfiel])
@@ -45,12 +44,11 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
       looptijdJaar,
     }
     const output = onCalculate(input)
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- auto-calculate on input change
     setResult(output)
   }, [startkapitaal, maandInleg, spaarrente, beleggingsRendement, looptijdJaar, onCalculate])
 
-  // Get chart data points (show 4 intervals) - reserved for future chart implementation
-  const _getChartData = () => {
+  // Get chart data points (show 4 intervals)
+  const getChartData = () => {
     if (!result || result.jaarData.length < 2) return []
     const years = looptijdJaar
     const intervals = [

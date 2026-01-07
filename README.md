@@ -184,6 +184,90 @@ Make sure `MICROSOFT_USER_EMAIL_SECONDARY` is set in `.env.local` and on Vercel.
 
 The `/me/calendar/getSchedule` endpoint requires user login. Use `/users/{email}/calendar/getSchedule` instead for application credentials.
 
+## Financial Calculators
+
+### Available Calculators
+
+| Calculator | Slug | Description |
+|------------|------|-------------|
+| Sparen vs Beleggen | `sparen-vs-beleggen` | Compare savings vs investment returns |
+| Pensioenbeleggen | `pensioenbeleggen` | Pension investment calculator with growth phases |
+
+### Embedding Calculators
+
+#### Single Calculator (iframe)
+
+Embed a specific calculator:
+
+```html
+<iframe
+  src="https://check.ambitionvalley.nl/calculators/sparen-vs-beleggen"
+  width="100%"
+  height="700"
+  frameborder="0"
+></iframe>
+```
+
+#### All Calculators with Tabs
+
+Embed all calculators with a tab switcher:
+
+```html
+<iframe
+  src="https://check.ambitionvalley.nl/calculators/all"
+  width="100%"
+  height="750"
+  frameborder="0"
+></iframe>
+```
+
+You can pre-select a calculator using the `calc` query parameter:
+
+```html
+<!-- Pre-select pensioenbeleggen -->
+<iframe
+  src="https://check.ambitionvalley.nl/calculators/all?calc=pensioenbeleggen"
+  width="100%"
+  height="750"
+  frameborder="0"
+></iframe>
+```
+
+#### Custom Theming
+
+Customize colors via URL parameters:
+
+```html
+<iframe
+  src="https://check.ambitionvalley.nl/calculators/sparen-vs-beleggen?bg=ffffff&accent=307cf1&text=0f172a"
+  width="100%"
+  height="700"
+  frameborder="0"
+></iframe>
+```
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `bg` | Background color (hex) | `ffffff` |
+| `accent` | Accent color (hex) | `307cf1` |
+| `text` | Text color (hex) | `0f172a` |
+
+### Calculator Routes
+
+| Route | Description |
+|-------|-------------|
+| `/calculators` | Redirects to first enabled calculator |
+| `/calculators/[slug]` | Single calculator page |
+| `/calculators/all` | All calculators with tab switcher |
+| `/calculators/all?calc=slug` | Pre-select specific calculator |
+
+### PDF Reports
+
+Users can request email reports with PDF attachments:
+- API endpoint: `POST /api/report/send`
+- Rate limited: 5 requests per email per hour
+- PDF generated with `@react-pdf/renderer`
+
 ## File Locations
 
 | Feature | Location |
@@ -192,5 +276,7 @@ The `/me/calendar/getSchedule` endpoint requires user login. Use `/users/{email}
 | Calendar Component | `src/integrations/booking/components/BookingCalendar.tsx` |
 | Availability Logic | `src/integrations/booking/lib/availability.ts` |
 | Microsoft Graph | `src/integrations/booking/lib/microsoft-graph.ts` |
+| Calculators | `src/integrations/calculators/` |
+| Calculator UI | `src/integrations/calculators/calculators/[slug]/ui.tsx` |
 | Database Migrations | `supabase/migrations/` |
 | Test Scripts | `scripts/` |

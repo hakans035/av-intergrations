@@ -38,12 +38,11 @@ export function CalculatorUI({ defaults, onCalculate }: Props) {
       spaarrente,
     }
     const output = onCalculate(input)
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- auto-calculate on input change
     setResult(output)
   }, [startkapitaal, maandInleg, inlegPeriodeJaar, jaarlijksRendement, doorgroeiPeriodeJaar, spaarrente, onCalculate])
 
-  // Get chart data points (show key intervals) - reserved for future chart implementation
-  const _getChartData = () => {
+  // Get chart data points (show key intervals)
+  const getChartData = () => {
     if (!result || result.jaarData.length < 2) return []
     const totalYears = inlegPeriodeJaar + doorgroeiPeriodeJaar
 

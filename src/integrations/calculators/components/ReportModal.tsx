@@ -44,7 +44,7 @@ export function ReportModal({ isOpen, onClose, calculatorType, calculatorData }:
       return
     }
 
-    // Set loading state
+    // US-003: Set loading state
     setModalState('loading')
 
     try {
@@ -70,10 +70,10 @@ export function ReportModal({ isOpen, onClose, calculatorType, calculatorData }:
 
       console.log('Report sent successfully:', { email, calculatorType })
 
-      // Set success state
+      // US-004: Set success state
       setModalState('success')
     } catch (err) {
-      // Set error state
+      // US-005: Set error state
       console.error('Report error:', err)
       setModalState('error')
       setServerError(err instanceof Error ? err.message : 'Er is iets misgegaan. Probeer het opnieuw.')
@@ -103,7 +103,7 @@ export function ReportModal({ isOpen, onClose, calculatorType, calculatorData }:
     }
   }
 
-  // Success State
+  // US-004: Success State
   if (modalState === 'success') {
     return (
       <div style={styles.overlay} onClick={handleOverlayClick}>
