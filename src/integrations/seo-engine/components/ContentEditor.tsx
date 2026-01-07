@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { ContentDraft } from '../types';
-import { StatusBadge, ActionButton, LanguageSelector } from './shared';
+import { StatusBadge, ActionButton } from './shared';
 
 interface ContentEditorProps {
   draft: ContentDraft;

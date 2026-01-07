@@ -64,7 +64,7 @@ export function FieldWrapper({
         )}
 
         {/* Input Field */}
-        <div className="mt-6" role="group" aria-required={required}>
+        <div className="mt-6" role="group" aria-labelledby={`field-${title?.replace(/\s+/g, '-')}`}>
           {children}
         </div>
       </div>

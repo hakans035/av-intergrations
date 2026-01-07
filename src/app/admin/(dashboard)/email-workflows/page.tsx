@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { createServiceClient } from '@/lib/supabase/server';
 import { StatsCard } from '@/components/admin/StatsCard';
-import { Mail, Send, AlertCircle, Clock, Plus, Play, Pause, Trash2 } from 'lucide-react';
+import { Mail, Send, AlertCircle, Clock, Plus, Play, Pause } from 'lucide-react';
 
 interface EmailWorkflow {
   id: string;

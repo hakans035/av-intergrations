@@ -1,9 +1,10 @@
-import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { AdminHeader } from '@/components/admin/AdminHeader'
 import { StatsCard } from '@/components/admin/StatsCard'
 import { TriggerDiscoveryButton } from './TriggerDiscoveryButton'
 import { TriggerGenerateButton } from './TriggerGenerateButton'
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 interface KeywordQueueItem {
   id: string
@@ -103,33 +104,22 @@ function getStatusBadge(status: string) {
 }
 
 export default async function QueuePage() {
-  const supabase = await createClient()
-
-  const { data: { user }, error } = await supabase.auth.getUser()
-
-  if (error || !user) {
-    redirect('/admin/login')
-  }
-
   const { queueItems, discoveryLogs, stats } = await getQueueData()
 
   return (
-    <>
-      <AdminHeader user={user} />
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
-        <div className="mb-6">
-          <a
-            href="/admin/seo-engine"
-            className="inline-flex items-center text-sm text-white/60 hover:text-white transition-colors"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Terug naar overzicht
-          </a>
-        </div>
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Back Button */}
+      <div className="mb-6">
+        <Link
+          href="/admin/seo-engine"
+          className="inline-flex items-center text-sm text-white/60 hover:text-white transition-colors"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Terug naar overzicht
+        </Link>
+      </div>
 
         {/* Page Header */}
         <div className="mb-8 animate-fade-in-up flex justify-between items-start">
@@ -345,7 +335,6 @@ export default async function QueuePage() {
             </div>
           </div>
         </div>
-      </main>
-    </>
+    </main>
   )
 }

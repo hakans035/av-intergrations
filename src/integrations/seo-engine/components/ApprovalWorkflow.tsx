@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import type { ContentDraft, ApprovalGate, ApprovalAction, ApprovalLog } from '../types';
 import type { Reviewer, WorkflowState } from '../lib/approval-workflow';
-import { StatusBadge, ActionButton, ReviewerSelect } from './shared';
+import { StatusBadge, ActionButton } from './shared';
 
 interface ApprovalWorkflowProps {
   draft: ContentDraft;
@@ -52,7 +52,7 @@ function formatDate(dateString: string): string {
 export function ApprovalWorkflow({
   draft,
   workflowState,
-  reviewers,
+  reviewers: _reviewers,
   auditLogs,
   currentUser,
   onApprove,

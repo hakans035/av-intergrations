@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import React from 'react'
 import { sendEmail, isResendConfigured, renderEmailTemplate, CalculatorReportEmail, getEmailSubject } from '@/lib/email'
 import type { EmailSummaryData, CalculatorType } from '@/lib/email'
 import {

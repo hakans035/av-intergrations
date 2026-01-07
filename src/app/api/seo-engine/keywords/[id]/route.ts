@@ -9,7 +9,6 @@ import {
   validateAdminToken,
   unauthorizedResponse,
   successResponse,
-  notFoundResponse,
   serverErrorResponse,
   createRequestLogger,
 } from '../../_shared/utils';

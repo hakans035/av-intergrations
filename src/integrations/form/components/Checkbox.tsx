@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useId } from 'react';
-import { Check, Square, CheckSquare } from 'lucide-react';
+import { Check, Square } from 'lucide-react';
 import { FormChoice } from '../types';
 
 interface CheckboxProps {

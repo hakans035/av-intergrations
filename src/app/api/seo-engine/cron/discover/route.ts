@@ -162,7 +162,7 @@ Selecteer precies 7 keywords, gesorteerd op relevantie en trending potentie.`;
     let discoveredKeywords: DiscoveryResponse;
     try {
       discoveredKeywords = JSON.parse(jsonText);
-    } catch (parseError) {
+    } catch {
       console.error('Failed to parse AI response:', responseText);
       throw new Error('Invalid AI response format - could not parse JSON');
     }

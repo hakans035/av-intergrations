@@ -154,14 +154,6 @@ function formatTime(dateString: string, timezone: string = 'Europe/Amsterdam'): 
   });
 }
 
-// Format price
-function formatPrice(cents: number): string {
-  return new Intl.NumberFormat('nl-NL', {
-    style: 'currency',
-    currency: 'EUR',
-  }).format(cents / 100);
-}
-
 // Calculate days until event
 function getDaysUntil(startTime: string): number {
   const now = new Date();

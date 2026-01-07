@@ -34,7 +34,7 @@ export function TriggerDiscoveryButton() {
           message: data.error || 'Er is een fout opgetreden',
         })
       }
-    } catch (error) {
+    } catch {
       setResult({
         success: false,
         message: 'Verbindingsfout',

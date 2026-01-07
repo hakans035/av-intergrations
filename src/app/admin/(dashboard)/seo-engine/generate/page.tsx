@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 interface GeneratedPost {
@@ -14,7 +13,6 @@ interface GeneratedPost {
 }
 
 export default function GeneratePostPage() {
-  const router = useRouter()
   const [keyword, setKeyword] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
@@ -128,12 +126,12 @@ export default function GeneratePostPage() {
               )}
 
               <div className="flex justify-end gap-4">
-                <a
+                <Link
                   href="/admin/seo-engine"
                   className="px-6 py-3 text-sm font-medium text-white/70 hover:text-white transition-colors"
                 >
                   Annuleren
-                </a>
+                </Link>
                 <button
                   onClick={handleGenerate}
                   disabled={isGenerating || !keyword.trim()}
@@ -211,12 +209,12 @@ export default function GeneratePostPage() {
                 Opnieuw genereren
               </button>
               <div className="flex gap-4">
-                <a
+                <Link
                   href="/admin/seo-engine"
                   className="px-6 py-3 text-sm font-medium text-white/70 hover:text-white transition-colors"
                 >
                   Annuleren
-                </a>
+                </Link>
                 <button
                   onClick={handlePublishToDraft}
                   disabled={isPublishing}

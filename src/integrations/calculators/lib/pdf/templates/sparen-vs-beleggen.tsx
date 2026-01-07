@@ -305,6 +305,7 @@ export const SparenVsBeleggenReport: React.FC<{ data: SparenVsBeleggenReportData
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
+          {/* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image component doesn't use alt */}
           <Image style={styles.logoImage} src={LOGO_URL} />
           <View style={styles.headerText}>
             <Text style={styles.title}>Uw Persoonlijke Beleggingsanalyse</Text>
@@ -397,7 +398,7 @@ export const SparenVsBeleggenReport: React.FC<{ data: SparenVsBeleggenReportData
         {/* Disclaimer */}
         <View style={styles.disclaimer}>
           <Text style={styles.disclaimerText}>
-            DISCLAIMER: Deze berekening is indicatief. Beleggen brengt risico's met zich mee.
+            DISCLAIMER: Deze berekening is indicatief. Beleggen brengt risico&apos;s met zich mee.
             U kunt uw inleg verliezen. In het verleden behaalde resultaten bieden geen garantie
             voor de toekomst.
           </Text>

@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import type { PerformanceMetric, PerformanceReport, Language } from '../types';
-import type { PerformanceSummary, ReviewReport } from '../lib/performance-monitoring';
-import { MetricCard, ActionButton, LanguageSelector, LoadingState, EmptyState } from './shared';
+import type { PerformanceReport, Language } from '../types';
+import type { ReviewReport } from '../lib/performance-monitoring';
+import { MetricCard, ActionButton, LoadingState, EmptyState } from './shared';
 
 interface PerformanceDashboardProps {
   reports: PerformanceReport[];

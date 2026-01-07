@@ -3,7 +3,6 @@
  * Handle Webflow webhooks
  */
 
-import { z } from 'zod';
 import crypto from 'crypto';
 import {
   successResponse,

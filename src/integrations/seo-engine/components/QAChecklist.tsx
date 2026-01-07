@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import type { QACheckResult, ComplianceCheckResult, SEOValidationResult } from '../types';
+import type { QACheckResult } from '../types';
 import { ActionButton } from './shared';
 
 interface QAChecklistProps {

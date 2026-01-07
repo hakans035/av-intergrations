@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-head-element -- Email templates use standard HTML, not Next.js */
 import React from 'react'
 
 export interface FormSubmissionEmailProps {

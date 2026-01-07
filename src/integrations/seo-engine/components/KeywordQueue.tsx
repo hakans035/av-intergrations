@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { Keyword, Language, KeywordIntent, KeywordStatus } from '../types';
-import { ActionButton, LanguageSelector, EmptyState, LoadingState } from './shared';
+import { EmptyState, LoadingState } from './shared';
 
 interface KeywordQueueProps {
   keywords: Keyword[];

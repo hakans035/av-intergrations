@@ -282,6 +282,7 @@ function SubmissionDetailModal({ submission, onClose }: SubmissionDetailModalPro
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration pattern for modal
     setMounted(true)
     // Prevent body scroll when modal is open
     document.body.style.overflow = 'hidden'

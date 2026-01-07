@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { ArrowUp, ArrowDown, Check, Clock, Users, CheckCircle2 } from 'lucide-react';
+import { ArrowUp, ArrowDown, Check, Users, CheckCircle2 } from 'lucide-react';
 import Image from 'next/image';
 import { FormDefinition, FormAnswers, FormField } from '../types';
 import { getNextFieldIndex, interpolateTemplate } from '../lib/form-logic';
@@ -46,6 +46,7 @@ export function Form({ form, onSubmit }: FormProps) {
   // Start at questions if no welcome screen
   useEffect(() => {
     if (!hasWelcomeScreen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- initial state setup
       setState('questions');
     }
   }, [hasWelcomeScreen]);
@@ -74,6 +75,7 @@ export function Form({ form, onSubmit }: FormProps) {
     const progress = calculateProgress();
     const progressMessage = getProgressMessage(progress);
     if (progressMessage && state === 'questions') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- motivation UI feedback
       setMotivationMessage(`${progressMessage.emoji} ${progressMessage.message}`);
       setShowMotivation(true);
       const timer = setTimeout(() => setShowMotivation(false), 3000);

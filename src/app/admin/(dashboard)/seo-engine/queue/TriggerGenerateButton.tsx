@@ -42,7 +42,7 @@ export function TriggerGenerateButton() {
           message: data.error || 'Er is een fout opgetreden',
         })
       }
-    } catch (error) {
+    } catch {
       setResult({
         success: false,
         message: 'Verbindingsfout',

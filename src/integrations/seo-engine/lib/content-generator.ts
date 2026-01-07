@@ -240,7 +240,7 @@ OUTPUT FORMAT:
     const slug = this.generateSlug(keyword);
 
     // Extract and validate structure
-    const headings = this.extractHeadings(cleanedContent);
+    const _headings = this.extractHeadings(cleanedContent);
     const faqs = this.extractFAQs(cleanedContent);
 
     // Process links
@@ -687,7 +687,7 @@ OUTPUT FORMAT:
       .substring(0, contentConfig.seo.slugMaxLength);
   }
 
-  private generateTitle(keyword: string, language: Language): string {
+  private generateTitle(keyword: string, _language: Language): string {
     // Sentence case: capitalize first word only, plus acronyms
     const words = keyword.toLowerCase().split(' ');
     const title = words
@@ -770,7 +770,7 @@ OUTPUT FORMAT:
     return description.substring(0, contentConfig.seo.descriptionMaxLength);
   }
 
-  private determineSchemaType(faqCount: number, contentType: ContentType): SchemaType {
+  private determineSchemaType(faqCount: number, _contentType: ContentType): SchemaType {
     if (faqCount >= 3) {
       return 'article-faq';
     }
@@ -928,7 +928,7 @@ OUTPUT FORMAT:
 
   private getWordCountRange(wordCount: number): { min: number; max: number } {
     // Determine which content type this word count fits
-    for (const [type, range] of Object.entries(contentConfig.wordCount)) {
+    for (const [_type, range] of Object.entries(contentConfig.wordCount)) {
       if (wordCount >= range.min - 100 && wordCount <= range.max + 100) {
         return range;
       }

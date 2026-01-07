@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-head-element */
+/* eslint-disable @next/next/no-head-element, @next/next/no-img-element -- Email templates use standard HTML, not Next.js */
 import React from 'react';
 
 export interface LeadFollowUpEmailProps {

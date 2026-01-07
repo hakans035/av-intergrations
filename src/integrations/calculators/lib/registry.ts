@@ -104,22 +104,22 @@ class CalculatorRegistry {
 
     try {
       // Dynamic import - path is relative to calculators folder
-      const module = (await import(
+      const calculatorModule = (await import(
         `@/integrations/calculators/calculators/${slug}`
       )) as CalculatorModule
 
       // Validate module exports
-      if (!this.validateModule(module)) {
+      if (!this.validateModule(calculatorModule)) {
         console.error(`[Registry] Invalid module exports: ${slug}`)
         return null
       }
 
       // Cache module
-      this.moduleCache.set(slug, module)
+      this.moduleCache.set(slug, calculatorModule)
 
       return {
-        config: module.config,
-        module,
+        config: calculatorModule.config,
+        module: calculatorModule,
       }
     } catch (error) {
       console.error(`[Registry] Failed to load calculator: ${slug}`, error)

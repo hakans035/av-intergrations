@@ -248,7 +248,7 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
                               <tr>
                                 <td style={{ padding: '16px 20px' }}>
                                   <p style={{ fontSize: '14px', color: '#854d0e', margin: 0, lineHeight: '1.6' }}>
-                                    <strong>Factuur:</strong> U ontvangt de factuur separaat per e-mail van een van onze collega's.
+                                    <strong>Factuur:</strong> U ontvangt de factuur separaat per e-mail van een van onze collega&apos;s.
                                   </p>
                                 </td>
                               </tr>
