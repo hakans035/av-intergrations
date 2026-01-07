@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
 import { StatsCard } from '@/components/admin/StatsCard'
 import { TriggerDiscoveryButton } from './TriggerDiscoveryButton'
+import { SEONavDropdown } from '../SEONavDropdown'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -130,6 +131,7 @@ export default async function QueuePage() {
           </div>
           <div className="flex gap-3">
             <TriggerDiscoveryButton />
+            <SEONavDropdown />
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
+import { SEONavDropdown } from '../SEONavDropdown'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -89,11 +90,14 @@ export default async function DraftsPage() {
       </div>
 
       {/* Page Header */}
-      <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-2xl sm:text-3xl font-bold gradient-text">Blog Drafts</h1>
-        <p className="mt-1 text-sm text-white/60">
-          Review en publiceer gegenereerde blog posts
-        </p>
+      <div className="mb-8 animate-fade-in-up flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold gradient-text">Blog Drafts</h1>
+          <p className="mt-1 text-sm text-white/60">
+            Review en publiceer gegenereerde blog posts
+          </p>
+        </div>
+        <SEONavDropdown />
       </div>
 
       {/* Stats */}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { SEONavDropdown } from '../SEONavDropdown'
 
 interface KeywordQueueItem {
   id: string
@@ -147,11 +148,14 @@ export default function GeneratePostPage() {
       </div>
 
       {/* Page Header */}
-      <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-2xl sm:text-3xl font-bold gradient-text">Blog Genereren</h1>
-        <p className="mt-1 text-sm text-white/60">
-          Selecteer een keyword uit de queue om een blog te genereren
-        </p>
+      <div className="mb-8 animate-fade-in-up flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold gradient-text">Blog Genereren</h1>
+          <p className="mt-1 text-sm text-white/60">
+            Selecteer een keyword uit de queue om een blog te genereren
+          </p>
+        </div>
+        <SEONavDropdown />
       </div>
 
       {/* Step: Select Keyword */}

@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
 import { PublishToWebflowButton } from './PublishToWebflowButton'
+import { SEONavDropdown } from '../../SEONavDropdown'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -111,9 +112,12 @@ export default async function DraftDetailPage({ params }: PageProps) {
             Keyword: {draft.keyword} • {draft.language === 'nl' ? 'Nederlands' : 'Engels'}
           </p>
         </div>
-        {!isPublished && (
-          <PublishToWebflowButton draftId={draft.id} />
-        )}
+        <div className="flex gap-3">
+          {!isPublished && (
+            <PublishToWebflowButton draftId={draft.id} />
+          )}
+          <SEONavDropdown />
+        </div>
       </div>
 
       {/* Meta Info */}
