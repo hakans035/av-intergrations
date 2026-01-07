@@ -105,10 +105,14 @@ export async function POST(request: Request) {
     .gte('created_at', `${today}T00:00:00Z`)
     .lt('created_at', `${today}T23:59:59Z`);
 
-  if (todayCount && todayCount >= 1) {
+  // Allow admin to bypass daily limit with ?force=true
+  const url = new URL(request.url);
+  const forceGenerate = url.searchParams.get('force') === 'true';
+
+  if (todayCount && todayCount >= 1 && !forceGenerate) {
     return Response.json({
       success: true,
-      message: 'Daily limit reached (1 post per day)',
+      message: 'Daily limit reached (1 post per day). Use ?force=true to bypass.',
       generated: false,
       todayCount,
     });
