@@ -78,6 +78,7 @@ export async function POST(
         'meta-description': draftData.meta_description || '',
         'source-keyword': draftData.keyword,
         language: draftData.language === 'nl' ? 'Dutch' : 'English',
+        'content-status': 'Published',
       },
       isDraft: false, // Publish immediately
     }]);
