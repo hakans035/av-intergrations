@@ -54,15 +54,24 @@ export function SEONavDropdown() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
+    if (!isOpen) return
+
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    // Use setTimeout to avoid immediate triggering
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('click', handleClickOutside)
+    }, 0)
+
+    return () => {
+      clearTimeout(timeoutId)
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [isOpen])
 
   // Get current page label
   const currentPage = navItems.find(item =>
@@ -99,10 +108,11 @@ export function SEONavDropdown() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-start gap-3 px-4 py-3 hover:bg-white/5 transition-colors ${
-                  isActive ? 'bg-white/10' : ''
-                }`}
+                className={`block w-full cursor-pointer`}
               >
+                <div className={`flex items-start gap-3 px-4 py-3 hover:bg-white/5 transition-colors ${
+                  isActive ? 'bg-white/10' : ''
+                }`}>
                 <div className={`mt-0.5 ${isActive ? 'text-green-400' : 'text-white/60'}`}>
                   {item.icon}
                 </div>
@@ -111,6 +121,7 @@ export function SEONavDropdown() {
                     {item.label}
                   </div>
                   <div className="text-xs text-white/50">{item.description}</div>
+                </div>
                 </div>
               </Link>
             )
