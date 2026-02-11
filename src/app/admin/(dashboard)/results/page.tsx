@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { createServiceClient } from '@/lib/supabase/server'
 import { PeriodFilter } from '@/components/admin/PeriodFilter'
 import { ambitionValleyForm } from '@/integrations/form/data/ambition-valley-form'

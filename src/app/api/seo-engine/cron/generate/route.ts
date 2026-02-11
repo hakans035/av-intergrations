@@ -9,7 +9,9 @@ import { createServiceClient } from '@/lib/supabase/server';
 import { ContentGeneratorService, createImageGeneratorWithWebflow, createWebflowClient } from '@/integrations/seo-engine';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -300,7 +302,7 @@ export async function POST(request: Request) {
 
     if (adminEmails.length > 0) {
       try {
-        await resend.emails.send({
+        await getResend().emails.send({
           from: 'SEO Engine <noreply@ambitionvalley.nl>',
           to: adminEmails,
           subject: `Nieuwe blog ter review: ${processedContent.title}`,
@@ -414,7 +416,7 @@ export async function POST(request: Request) {
     const adminEmails = process.env.SEO_ADMIN_EMAILS?.split(',') || [];
     if (adminEmails.length > 0) {
       try {
-        await resend.emails.send({
+        await getResend().emails.send({
           from: 'SEO Engine <noreply@ambitionvalley.nl>',
           to: adminEmails,
           subject: `[FOUT] Blog generatie mislukt: ${keyword.keyword}`,

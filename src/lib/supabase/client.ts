@@ -7,9 +7,9 @@ import type { Database } from './types'
  * Supports both new (PUBLISHABLE_KEY) and legacy (ANON_KEY) env vars.
  */
 export function createClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-    || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    || (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '')
 
   return createBrowserClient<Database>(supabaseUrl, supabaseKey)
 }

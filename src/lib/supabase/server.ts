@@ -10,9 +10,9 @@ import type { Database } from './types'
  */
 export async function createClient() {
   const cookieStore = await cookies()
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-    || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    || (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '')
 
   return createServerClient<Database>(
     supabaseUrl,
@@ -46,9 +46,9 @@ export async function createClient() {
  * IMPORTANT: Only use server-side. Never expose to client.
  */
 export function createServiceClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
   const serviceKey = process.env.SUPABASE_SECRET_KEY
-    || process.env.SUPABASE_SERVICE_ROLE_KEY!
+    || (process.env.SUPABASE_SERVICE_ROLE_KEY ?? '')
 
   return createSupabaseClient<Database>(
     supabaseUrl,
