@@ -228,10 +228,10 @@ export default async function TrajectenPage() {
         {/* Back Link */}
         <div className="mt-8 text-center animate-fade-in-up" style={{ animationDelay: '500ms' }}>
           <Link
-            href="/booking"
+            href="https://ambitionvalley.nl/"
             className="text-white/60 hover:text-white transition-colors"
           >
-            ← Terug naar gratis intake
+            ← Terug naar Ambition Valley
           </Link>
         </div>
       </div>

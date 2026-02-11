@@ -43,21 +43,11 @@ export const ambitionValleyForm: FormDefinition = {
         show_button: true,
         share_icons: false,
         button_mode: 'redirect',
-        button_text: 'Bekijk alternatieven',
-        redirect_url: '/booking/trajecten',
-        description: `Op basis van je antwoorden lijkt het 1-op-1 traject op dit moment niet optimaal voor jou.
+        button_text: 'Naar Ambition Valley',
+        redirect_url: 'https://ambitionvalley.nl/',
+        description: `Bedankt voor je interesse! Op basis van je antwoorden is ons traject op dit moment niet de beste match voor jouw situatie.
 
-Maar goed nieuws: er is wél een alternatief dat perfect aansluit op jouw situatie.
-
-Sluit je aan bij onze Ambition Valley Groepsdagen
-
-Tijdens deze sessies krijg je:
-
-direct toepasbare belastingbesparingstips
-inzicht in hoe je vermogen kunt laten groeien
-praktische uitleg op jouw niveau
-een helder stappenplan dat wél bij je past
-de mogelijkheid om vragen te stellen aan onze experts`,
+Wil je toch meer weten over wat Ambition Valley voor je kan betekenen? Bezoek onze website voor meer informatie.`,
       },
     },
     {
