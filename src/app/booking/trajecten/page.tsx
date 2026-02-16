@@ -173,10 +173,18 @@ export default async function TrajectenPage() {
                   <span className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" />
                     {(() => {
-                      const bookingMin = eventType.booking_duration_minutes ?? eventType.duration_minutes;
-                      return bookingMin >= 60
-                        ? `${Math.floor(bookingMin / 60)} uur sessie`
-                        : `${bookingMin} min sessie`;
+                      const totalMin = eventType.duration_minutes;
+                      const bookingMin = eventType.booking_duration_minutes;
+                      const totalLabel = totalMin >= 60
+                        ? `${Math.floor(totalMin / 60)} uur traject`
+                        : `${totalMin} min traject`;
+                      if (bookingMin && bookingMin !== totalMin) {
+                        const bookingLabel = bookingMin >= 60
+                          ? `${Math.floor(bookingMin / 60)} uur onboarding sessie`
+                          : `${bookingMin} min onboarding sessie`;
+                        return <>{totalLabel}<br />{bookingLabel}</>;
+                      }
+                      return totalLabel;
                     })()}
                   </span>
                   <span className="flex items-center gap-1">
