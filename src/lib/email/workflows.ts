@@ -47,6 +47,7 @@ export interface BookingWithEventType {
     title: string;
     description: string | null;
     duration_minutes: number;
+    booking_duration_minutes: number | null;
     location_type: string;
     location_address: string | null;
   };
@@ -191,7 +192,7 @@ async function renderTemplate(
         eventTitle: booking.event_types.title,
         eventDate,
         eventTime,
-        duration: booking.event_types.duration_minutes,
+        duration: booking.event_types.booking_duration_minutes ?? booking.event_types.duration_minutes,
         locationType: booking.event_types.location_type as 'online' | 'on_location' | 'hybrid',
         locationAddress: booking.event_types.location_address || undefined,
         meetingUrl: booking.meeting_url || undefined,
@@ -242,7 +243,7 @@ async function renderTemplate(
         eventTitle: booking.event_types.title,
         eventDate,
         eventTime,
-        duration: booking.event_types.duration_minutes,
+        duration: booking.event_types.booking_duration_minutes ?? booking.event_types.duration_minutes,
         locationType: booking.event_types.location_type as 'online' | 'on_location' | 'hybrid',
         locationAddress: booking.event_types.location_address || undefined,
         meetingUrl: booking.meeting_url || undefined,
@@ -379,6 +380,7 @@ export async function getBookingWithEventType(bookingId: string): Promise<Bookin
         title,
         description,
         duration_minutes,
+        booking_duration_minutes,
         location_type,
         location_address
       )

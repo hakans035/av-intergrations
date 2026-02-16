@@ -257,11 +257,24 @@ export async function createCalendarEvent(
     throw new Error('User email not configured for calendar events');
   }
 
-  // Microsoft Graph expects dateTime without 'Z' suffix when timeZone is specified
-  // Convert ISO strings to local datetime format
-  const formatDateTimeForGraph = (isoString: string): string => {
-    // Remove the 'Z' or timezone offset from ISO string
-    return isoString.replace('Z', '').replace(/[+-]\d{2}:\d{2}$/, '');
+  // Microsoft Graph expects dateTime in local time when timeZone is specified
+  // Convert UTC ISO strings to Amsterdam local time format
+  const formatDateTimeForGraph = (isoString: string, timeZone: string = 'Europe/Amsterdam'): string => {
+    const date = new Date(isoString);
+    // Format as local time in the target timezone (YYYY-MM-DDTHH:mm:ss)
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    }).formatToParts(date);
+
+    const get = (type: string) => parts.find(p => p.type === type)?.value || '00';
+    return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}`;
   };
 
   // Get secondary user email for shared calendar
@@ -296,11 +309,11 @@ export async function createCalendarEvent(
       `,
     },
     start: {
-      dateTime: formatDateTimeForGraph(booking.start_time),
+      dateTime: formatDateTimeForGraph(booking.start_time, booking.timezone || 'Europe/Amsterdam'),
       timeZone: booking.timezone || 'Europe/Amsterdam',
     },
     end: {
-      dateTime: formatDateTimeForGraph(booking.end_time),
+      dateTime: formatDateTimeForGraph(booking.end_time, booking.timezone || 'Europe/Amsterdam'),
       timeZone: booking.timezone || 'Europe/Amsterdam',
     },
     // Include team members as attendees - they will receive calendar invites
