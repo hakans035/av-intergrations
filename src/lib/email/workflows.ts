@@ -179,8 +179,12 @@ async function renderTemplate(
 
   switch (templateType) {
     case 'booking_confirmation': {
-      // Show invoice notice only for paid bookings (trajecten)
-      const showInvoiceNotice = booking.total_price_cents > 0;
+      const isTraject = booking.total_price_cents > 0;
+
+      // Include onboarding form download link for traject bookings
+      const onboardingFormUrl = isTraject
+        ? 'https://ckbixrvaktizlarmxxvv.supabase.co/storage/v1/object/public/form/form/Onboardingsformulier.docx'
+        : undefined;
 
       const props = {
         customerName: booking.customer_name,
@@ -193,7 +197,7 @@ async function renderTemplate(
         meetingUrl: booking.meeting_url || undefined,
         bookingId: booking.id,
         cancellationUrl,
-        showInvoiceNotice,
+        onboardingFormUrl,
       };
       const html = `<!DOCTYPE html>${renderToStaticMarkup(React.createElement(BookingConfirmationEmail, props))}`;
 

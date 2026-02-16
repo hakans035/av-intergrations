@@ -390,6 +390,7 @@ export type Database = {
       }
       event_types: {
         Row: {
+          booking_duration_minutes: number | null
           buffer_after_minutes: number | null
           buffer_before_minutes: number | null
           created_at: string | null
@@ -408,6 +409,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          booking_duration_minutes?: number | null
           buffer_after_minutes?: number | null
           buffer_before_minutes?: number | null
           created_at?: string | null
@@ -426,6 +428,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          booking_duration_minutes?: number | null
           buffer_after_minutes?: number | null
           buffer_before_minutes?: number | null
           created_at?: string | null

@@ -12,7 +12,7 @@ export interface BookingConfirmationEmailProps {
   meetingUrl?: string;
   bookingId: string;
   cancellationUrl: string;
-  showInvoiceNotice?: boolean;
+  onboardingFormUrl?: string;
 }
 
 export const getBookingConfirmationSubject = (eventTitle: string): string => {
@@ -29,7 +29,7 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
   locationAddress,
   meetingUrl,
   cancellationUrl,
-  showInvoiceNotice = false,
+  onboardingFormUrl,
 }) => {
   const displayName = customerName || 'Beste';
   const isOnline = locationType === 'online' || locationType === 'hybrid';
@@ -230,16 +230,16 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
                           </table>
                         )}
 
-                        {/* Invoice Notice - Only for paid trajecten */}
-                        {showInvoiceNotice && (
+                        {/* Onboarding Form - Only for traject bookings */}
+                        {onboardingFormUrl && (
                           <table
                             role="presentation"
                             cellPadding={0}
                             cellSpacing={0}
                             width="100%"
                             style={{
-                              backgroundColor: '#fefce8',
-                              borderLeft: '4px solid #eab308',
+                              backgroundColor: '#f0fdf4',
+                              borderLeft: '4px solid #22c55e',
                               borderRadius: '0 8px 8px 0',
                               marginBottom: '24px',
                             }}
@@ -247,9 +247,27 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
                             <tbody>
                               <tr>
                                 <td style={{ padding: '16px 20px' }}>
-                                  <p style={{ fontSize: '14px', color: '#854d0e', margin: 0, lineHeight: '1.6' }}>
-                                    <strong>Factuur:</strong> U ontvangt de factuur separaat per e-mail van een van onze collega&apos;s.
+                                  <p style={{ fontSize: '14px', color: '#166534', margin: '0 0 12px 0', lineHeight: '1.6' }}>
+                                    <strong>Onboardingsformulier:</strong> Download het formulier, vul het in en stuur het terug
+                                    v&oacute;&oacute;r de sessie. Je kunt het ook tijdens de call invullen.
                                   </p>
+                                  <a
+                                    href={onboardingFormUrl}
+                                    style={{
+                                      display: 'inline-block',
+                                      padding: '10px 20px',
+                                      backgroundColor: '#22c55e',
+                                      color: '#ffffff',
+                                      textDecoration: 'none',
+                                      borderRadius: '8px',
+                                      fontSize: '14px',
+                                      fontWeight: 'bold',
+                                    }}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    Download Onboardingsformulier
+                                  </a>
                                 </td>
                               </tr>
                             </tbody>

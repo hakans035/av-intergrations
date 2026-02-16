@@ -30,10 +30,6 @@ export type { BookingReminderEmailProps } from './templates/bookingReminder'
 export { IntakeFollowUpEmail, getIntakeFollowUpSubject } from './templates/intakeFollowUp'
 export type { IntakeFollowUpEmailProps } from './templates/intakeFollowUp'
 
-// Invoice email template
-export { InvoiceEmail, getInvoiceEmailSubject } from './templates/invoiceEmail'
-export type { InvoiceEmailProps } from './templates/invoiceEmail'
-
 // Team notification email template
 export { TeamNotificationEmail, getTeamNotificationSubject } from './templates/teamNotification'
 export type { TeamNotificationEmailProps, NotificationType } from './templates/teamNotification'

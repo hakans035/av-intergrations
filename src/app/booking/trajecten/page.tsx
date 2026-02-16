@@ -222,16 +222,8 @@ export default async function TrajectenPage() {
           </div>
         )}
 
-        {/* Payment Info */}
-        <div className="glass rounded-2xl p-4 border border-blue-300/20 animate-fade-in-up" style={{ animationDelay: '400ms' }}>
-          <p className="text-sm text-white/80 text-center">
-            <strong className="text-white">Betaling:</strong> Voor betaalde sessies vragen we 50% aanbetaling bij het boeken.
-            Het resterende bedrag wordt na de sessie gefactureerd.
-          </p>
-        </div>
-
         {/* Back Link */}
-        <div className="mt-8 text-center animate-fade-in-up" style={{ animationDelay: '500ms' }}>
+        <div className="mt-8 text-center animate-fade-in-up" style={{ animationDelay: '400ms' }}>
           <Link
             href="https://ambitionvalley.nl/"
             className="text-white/60 hover:text-white transition-colors"
