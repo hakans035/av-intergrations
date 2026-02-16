@@ -172,9 +172,12 @@ export default async function TrajectenPage() {
                 <div className="flex flex-wrap items-center gap-3 text-xs text-white/60 mb-4">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" />
-                    {eventType.duration_minutes >= 60
-                      ? `${Math.floor(eventType.duration_minutes / 60)} uur`
-                      : `${eventType.duration_minutes} min`}
+                    {(() => {
+                      const bookingMin = eventType.booking_duration_minutes ?? eventType.duration_minutes;
+                      return bookingMin >= 60
+                        ? `${Math.floor(bookingMin / 60)} uur sessie`
+                        : `${bookingMin} min sessie`;
+                    })()}
                   </span>
                   <span className="flex items-center gap-1">
                     {eventType.location_type === 'online' ? (

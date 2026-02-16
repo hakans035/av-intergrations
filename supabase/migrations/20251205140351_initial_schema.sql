@@ -86,6 +86,7 @@ CREATE TABLE event_types (
   requires_approval BOOLEAN DEFAULT false,
   buffer_before_minutes INTEGER DEFAULT 0,
   buffer_after_minutes INTEGER DEFAULT 0,
+  booking_duration_minutes INTEGER, -- Override for slot length (NULL = use duration_minutes)
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

@@ -283,6 +283,9 @@ export async function calculateAvailability(
 ): Promise<TimeSlot[]> {
   const { eventType, schedules, slots, blockedTimes, existingBookings } = context;
 
+  // Use booking_duration_minutes for slot generation if set, otherwise fall back to duration_minutes
+  const slotDuration = eventType.booking_duration_minutes ?? eventType.duration_minutes;
+
   let availableSlots: TimeSlot[] = [];
 
   // 1. Generate slots from recurring schedules
@@ -291,7 +294,7 @@ export async function calculateAvailability(
       schedule,
       startDate,
       endDate,
-      eventType.duration_minutes,
+      slotDuration,
       eventType.buffer_before_minutes,
       eventType.buffer_after_minutes
     );

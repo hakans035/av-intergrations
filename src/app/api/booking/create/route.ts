@@ -64,10 +64,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Calculate end time based on duration
+    // Calculate end time based on booking duration (or full duration if not set)
     const startTime = new Date(data.startTime);
+    const bookingDuration = eventType.booking_duration_minutes ?? eventType.duration_minutes;
     const endTime = new Date(
-      startTime.getTime() + eventType.duration_minutes * 60 * 1000
+      startTime.getTime() + bookingDuration * 60 * 1000
     );
 
     // Fetch existing bookings and blocked times for availability check

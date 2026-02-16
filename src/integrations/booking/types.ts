@@ -23,6 +23,7 @@ export interface EventType {
   requires_approval: boolean;
   buffer_before_minutes: number;
   buffer_after_minutes: number;
+  booking_duration_minutes: number | null;
   created_at: string;
   updated_at: string;
 }
