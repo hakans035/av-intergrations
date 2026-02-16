@@ -49,13 +49,10 @@ export const LeadFollowUpEmail: React.FC<LeadFollowUpEmailProps> = ({
                   <tbody>
                     {/* Header */}
                     <tr>
-                      <td align="center" style={{ backgroundColor: '#1e344b', padding: '32px 24px' }}>
-                        <img
-                          src="https://check.ambitionvalley.nl/logo-white.png"
-                          alt="Ambition Valley"
-                          width="180"
-                          style={{ display: 'block' }}
-                        />
+                      <td align="center" style={{ backgroundColor: '#307cf1', padding: '28px 24px' }}>
+                        <h1 style={{ color: '#ffffff', fontSize: '22px', fontWeight: 'bold', margin: 0 }}>
+                          AMBITION VALLEY
+                        </h1>
                       </td>
                     </tr>
 
