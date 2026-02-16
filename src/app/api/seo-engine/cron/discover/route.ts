@@ -53,14 +53,21 @@ interface DiscoveryResponse {
   discovery_summary: string;
 }
 
+export async function GET(request: Request) {
+  return handleDiscover(request);
+}
+
 export async function POST(request: Request) {
+  return handleDiscover(request);
+}
+
+async function handleDiscover(request: Request) {
   const startTime = Date.now();
 
-  // Validate cron secret or admin token
-  const cronSecret = request.headers.get('x-vercel-cron-secret');
+  // Validate cron secret (sent as Authorization: Bearer <secret> by Vercel) or admin token
   const authHeader = request.headers.get('authorization');
 
-  const isValidCron = cronSecret === process.env.CRON_SECRET;
+  const isValidCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
   const isValidAdmin = authHeader === `Bearer ${process.env.ADMIN_API_TOKEN}`;
 
   if (!isValidCron && !isValidAdmin) {
@@ -283,3 +290,7 @@ Selecteer precies 7 keywords, gesorteerd op relevantie en trending potentie.`;
     );
   }
 }
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;

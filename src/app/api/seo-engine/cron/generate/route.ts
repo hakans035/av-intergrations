@@ -82,14 +82,21 @@ async function generateContentWithGemini(
   return content;
 }
 
+export async function GET(request: Request) {
+  return handleGenerate(request);
+}
+
 export async function POST(request: Request) {
+  return handleGenerate(request);
+}
+
+async function handleGenerate(request: Request) {
   const startTime = Date.now();
 
-  // Validate cron secret or admin token
-  const cronSecret = request.headers.get('x-vercel-cron-secret');
+  // Validate cron secret (sent as Authorization: Bearer <secret> by Vercel) or admin token
   const authHeader = request.headers.get('authorization');
 
-  const isValidCron = cronSecret === process.env.CRON_SECRET;
+  const isValidCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
   const isValidAdmin = authHeader === `Bearer ${process.env.ADMIN_API_TOKEN}`;
 
   if (!isValidCron && !isValidAdmin) {
@@ -440,3 +447,7 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 120; // Content generation + image generation can take up to 2 minutes
