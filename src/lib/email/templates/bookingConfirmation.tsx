@@ -132,7 +132,10 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
                         </p>
 
                         <p style={{ fontSize: '15px', color: '#64748b', marginBottom: '24px', lineHeight: '1.7' }}>
-                          Uw boeking voor <strong>{eventTitle}</strong> is bevestigd. Hieronder vindt u alle details.
+                          {onboardingFormUrl
+                            ? <>Uw boeking voor de Onboardingscall voor het <strong>{eventTitle}</strong> traject is bevestigd. Hieronder vindt u alle details.</>
+                            : <>Uw boeking voor <strong>{eventTitle}</strong> is bevestigd. Hieronder vindt u alle details.</>
+                          }
                         </p>
 
                         {/* Booking Details Box */}
@@ -249,7 +252,7 @@ export const BookingConfirmationEmail: React.FC<BookingConfirmationEmailProps> =
                                 <td style={{ padding: '16px 20px' }}>
                                   <p style={{ fontSize: '14px', color: '#166534', margin: '0 0 12px 0', lineHeight: '1.6' }}>
                                     <strong>Onboardingsformulier:</strong> Download het formulier, vul het in en stuur het terug
-                                    v&oacute;&oacute;r de sessie. Je kunt het ook tijdens de call invullen.
+                                    naar <a href="mailto:ramin@ambitionvalley.nl" style={{ color: '#166534', fontWeight: 'bold' }}>ramin@ambitionvalley.nl</a> v&oacute;&oacute;r de sessie.
                                   </p>
                                   <a
                                     href={onboardingFormUrl}
