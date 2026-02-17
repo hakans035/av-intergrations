@@ -122,10 +122,7 @@ export async function GET(request: Request) {
       .eq('is_active', true);
 
     if (afterWorkflows && afterWorkflows.length > 0) {
-      // Look back 2 hours for recently completed events (for immediate follow-ups)
-      const lookBackTime = new Date(now.getTime() - 2 * 60 * 60 * 1000);
-
-      // Get bookings that ended recently
+      // Get all confirmed bookings whose end_time has passed (status-based, no time window)
       const { data: completedBookings, error: completedError } = await supabase
         .from('bookings')
         .select(`
@@ -153,7 +150,6 @@ export async function GET(request: Request) {
           )
         `)
         .eq('status', 'confirmed')
-        .gte('end_time', lookBackTime.toISOString())
         .lte('end_time', now.toISOString());
 
       if (completedError) {

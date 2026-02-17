@@ -301,6 +301,40 @@ CREATE POLICY "Service role full access email_logs" ON email_logs
   FOR ALL TO service_role USING (true);
 
 -- ============================================
+-- EMAIL WORKFLOWS: Default automation rules
+-- ============================================
+
+INSERT INTO email_workflows (id, name, slug, description, event_type_id, trigger_type, trigger_offset_minutes, email_subject, email_template, is_active) VALUES
+  -- Gratis Intake workflows
+  ('660e8400-e29b-41d4-a716-446655440001', 'Intake Bevestiging', 'intake-bevestiging', 'Bevestigingsmail na het boeken van een gratis intake gesprek', '550e8400-e29b-41d4-a716-446655440001', 'booking_confirmed', 0, 'Bevestiging: Je intake gesprek bij Ambition Valley', 'booking_confirmation', true),
+  ('660e8400-e29b-41d4-a716-446655440002', 'Intake Herinnering (3 dagen)', 'intake-herinnering-3d', 'Herinnering 3 dagen voor het intake gesprek', '550e8400-e29b-41d4-a716-446655440001', 'before_event', -4320, 'Herinnering: Je intake gesprek over 3 dagen', 'booking_reminder', true),
+  ('660e8400-e29b-41d4-a716-446655440003', 'Intake Herinnering (dag van)', 'intake-herinnering-0d', 'Herinnering op de dag van het intake gesprek', '550e8400-e29b-41d4-a716-446655440001', 'before_event', -180, 'Vandaag: Je intake gesprek bij Ambition Valley', 'booking_reminder', true),
+  ('660e8400-e29b-41d4-a716-446655440004', 'Intake Follow-up', 'intake-follow-up', 'Follow-up email na het intake gesprek met trajecten overzicht', '550e8400-e29b-41d4-a716-446655440001', 'after_event', 0, 'Bedankt voor je intake - Ontdek jouw vervolgstappen', 'intake_follow_up', true),
+
+  -- Financieel Fundament workflows
+  ('660e8400-e29b-41d4-a716-446655440005', 'Financieel Fundament Bevestiging', 'ff-bevestiging', 'Bevestigingsmail na het boeken van Financieel Fundament', '550e8400-e29b-41d4-a716-446655440002', 'booking_confirmed', 0, 'Bevestiging: Financieel Fundament sessie bij Ambition Valley', 'booking_confirmation', true),
+  ('660e8400-e29b-41d4-a716-446655440006', 'Financieel Fundament Herinnering', 'ff-herinnering', 'Herinnering 3 dagen voor de Financieel Fundament sessie', '550e8400-e29b-41d4-a716-446655440002', 'before_event', -4320, 'Herinnering: Je Financieel Fundament sessie over 3 dagen', 'booking_reminder', true),
+  ('660e8400-e29b-41d4-a716-446655440007', 'Financieel Fundament Follow-up', 'ff-follow-up', 'Bedankt email na de Financieel Fundament sessie', '550e8400-e29b-41d4-a716-446655440002', 'after_event', 0, 'Bedankt voor je Financieel Fundament sessie', 'traject_follow_up', true),
+
+  -- Private Wealth workflows
+  ('660e8400-e29b-41d4-a716-446655440008', 'Private Wealth Bevestiging', 'pw-bevestiging', 'Bevestigingsmail na het boeken van Private Wealth', '550e8400-e29b-41d4-a716-446655440003', 'booking_confirmed', 0, 'Bevestiging: Private Wealth sessie bij Ambition Valley', 'booking_confirmation', true),
+  ('660e8400-e29b-41d4-a716-446655440009', 'Private Wealth Herinnering', 'pw-herinnering', 'Herinnering 3 dagen voor de Private Wealth sessie', '550e8400-e29b-41d4-a716-446655440003', 'before_event', -4320, 'Herinnering: Je Private Wealth sessie over 3 dagen', 'booking_reminder', true),
+  ('660e8400-e29b-41d4-a716-446655440010', 'Private Wealth Follow-up', 'pw-follow-up', 'Bedankt email na de Private Wealth sessie', '550e8400-e29b-41d4-a716-446655440003', 'after_event', 0, 'Bedankt voor je Private Wealth sessie', 'traject_follow_up', true),
+
+  -- Ambition Wealth Circle workflows
+  ('660e8400-e29b-41d4-a716-446655440011', 'AWC Bevestiging', 'awc-bevestiging', 'Bevestigingsmail na het boeken van Ambition Wealth Circle', '550e8400-e29b-41d4-a716-446655440004', 'booking_confirmed', 0, 'Bevestiging: Ambition Wealth Circle bij Ambition Valley', 'booking_confirmation', true),
+  ('660e8400-e29b-41d4-a716-446655440012', 'AWC Herinnering', 'awc-herinnering', 'Herinnering 3 dagen voor de Ambition Wealth Circle', '550e8400-e29b-41d4-a716-446655440004', 'before_event', -4320, 'Herinnering: Ambition Wealth Circle over 3 dagen', 'booking_reminder', true),
+
+  -- Global cancellation workflow (applies to all events)
+  ('660e8400-e29b-41d4-a716-446655440013', 'Annuleringsbevestiging', 'annulering-bevestiging', 'Bevestigingsmail bij annulering (geldt voor alle evenementen)', NULL, 'booking_cancelled', 0, 'Annulering bevestigd - Ambition Valley', 'booking_cancellation', true)
+ON CONFLICT (slug) DO UPDATE SET
+  name = EXCLUDED.name,
+  description = EXCLUDED.description,
+  trigger_offset_minutes = EXCLUDED.trigger_offset_minutes,
+  email_subject = EXCLUDED.email_subject,
+  email_template = EXCLUDED.email_template;
+
+-- ============================================
 -- INVOICE SYSTEM TABLES
 -- ============================================
 
