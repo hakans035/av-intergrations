@@ -9,6 +9,7 @@ import {
 } from './index';
 import { BookingReminderEmail, getBookingReminderSubject } from './templates/bookingReminder';
 import { IntakeFollowUpEmail, getIntakeFollowUpSubject } from './templates/intakeFollowUp';
+import { TrajectFollowUpEmail, getTrajectFollowUpSubject } from './templates/trajectFollowUp';
 import { generateICSBuffer, type ICSEventParams } from './ics';
 
 // Types
@@ -180,7 +181,7 @@ async function renderTemplate(
 
   switch (templateType) {
     case 'booking_confirmation': {
-      const isTraject = booking.total_price_cents > 0;
+      const isTraject = booking.event_types.slug !== 'gratis-intake';
 
       // Include onboarding form download link for traject bookings
       const onboardingFormUrl = isTraject
@@ -265,14 +266,14 @@ async function renderTemplate(
     }
 
     case 'traject_follow_up': {
-      // Use the same follow-up template but could be customized
+      const onboardingFormUrl = 'https://ckbixrvaktizlarmxxvv.supabase.co/storage/v1/object/public/form/form/Onboardingsformulier.docx';
       const props = {
         customerName: booking.customer_name,
         eventTitle: booking.event_types.title,
-        trajectenUrl,
+        onboardingFormUrl,
       };
-      const html = `<!DOCTYPE html>${renderToStaticMarkup(React.createElement(IntakeFollowUpEmail, props))}`;
-      return { html, subject: `Bedankt voor uw sessie - ${booking.event_types.title}` };
+      const html = `<!DOCTYPE html>${renderToStaticMarkup(React.createElement(TrajectFollowUpEmail, props))}`;
+      return { html, subject: getTrajectFollowUpSubject(booking.event_types.title) };
     }
 
     default:
