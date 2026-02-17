@@ -187,7 +187,7 @@ export const TrajectFollowUpEmail: React.FC<TrajectFollowUpEmailProps> = ({
                                 <ol style={{ margin: 0, paddingLeft: '20px', color: '#64748b', fontSize: '14px', lineHeight: '2' }}>
                                   <li>Download en vul het onboardingsformulier in</li>
                                   <li>Stuur het ingevulde formulier terug naar <strong>ramin@ambitionvalley.nl</strong></li>
-                                  <li>Wij nemen contact op voor het plannen van je onboardingcall</li>
+                                  <li>Na ontvangst van het formulier starten we met jouw traject</li>
                                 </ol>
                               </td>
                             </tr>
