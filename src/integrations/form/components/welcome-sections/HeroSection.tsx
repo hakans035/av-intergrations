@@ -11,9 +11,9 @@ interface HeroSectionProps {
 }
 
 const checkmarks = [
-  'Persoonlijk Traject',
-  'Belastingbesparing & Vermogensgroei',
-  'Verdien het traject terug',
+  'Persoonlijk Traject, geen stoffig standaardadvies',
+  'Belastingbesparing en Vermogensgroei',
+  'Je verdient het traject terug doordat je minder belasting gaat betalen',
 ];
 
 function scrollToNextSection() {
@@ -25,6 +25,22 @@ export function HeroSection({ screen, onStart }: HeroSectionProps) {
     <section className="relative min-h-screen min-h-dvh flex flex-col items-center justify-center text-center px-4 sm:px-6 py-12 sm:py-16">
       {/* Main content */}
       <div className="max-w-3xl mx-auto">
+        {/* Vrijblijvend indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="flex items-center justify-center gap-2 mb-4 sm:mb-5"
+        >
+          <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-green-400" />
+          </span>
+          <span className="text-xs sm:text-sm text-white/60 font-medium">
+            Dit gesprek is vrijblijvend. Je zit nergens aan vast.
+          </span>
+        </motion.div>
+
         {/* Main heading */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
@@ -57,7 +73,7 @@ export function HeroSection({ screen, onStart }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center gap-2 sm:gap-x-6 sm:gap-y-2 mb-6 sm:mb-10"
+          className="flex flex-col items-start sm:flex-row sm:flex-wrap sm:justify-center sm:items-center gap-2 sm:gap-x-6 sm:gap-y-2 mb-6 sm:mb-10 mx-auto w-fit"
         >
           {checkmarks.map((text) => (
             <div key={text} className="flex items-center gap-2 text-white/80">
@@ -75,7 +91,7 @@ export function HeroSection({ screen, onStart }: HeroSectionProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col items-center mb-8 sm:mb-12"
+            className="flex flex-col items-center mb-4 sm:mb-12"
           >
             <motion.button
               onClick={onStart}
@@ -116,7 +132,7 @@ export function HeroSection({ screen, onStart }: HeroSectionProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 1.2 }}
-        className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 cursor-pointer group"
+        className="absolute bottom-2 sm:bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 cursor-pointer group"
       >
         <span className="text-[10px] sm:text-xs text-white/40 font-medium tracking-wide group-hover:text-white/60 transition-colors">
           Scroll om meer te lezen
