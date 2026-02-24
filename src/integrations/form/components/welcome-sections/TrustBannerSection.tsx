@@ -50,7 +50,7 @@ export function TrustBannerSection() {
   }, []);
 
   return (
-    <section className="py-2 sm:py-8 overflow-hidden">
+    <section className="pt-2 pb-6 sm:py-8 overflow-hidden">
       <motion.p
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}

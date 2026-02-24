@@ -132,16 +132,16 @@ export function HeroSection({ screen, onStart }: HeroSectionProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 1.2 }}
-        className="absolute bottom-2 sm:bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 cursor-pointer group"
+        className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 cursor-pointer group"
       >
-        <span className="text-[10px] sm:text-xs text-white/40 font-medium tracking-wide group-hover:text-white/60 transition-colors">
+        <span className="text-xs sm:text-xs text-white/60 font-medium tracking-wide group-hover:text-white/80 transition-colors">
           Scroll om meer te lezen
         </span>
         <motion.div
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+          <ChevronDown className="w-5 h-5 sm:w-5 sm:h-5 text-white/60 group-hover:text-white/80 transition-colors" />
         </motion.div>
       </motion.button>
     </section>
