@@ -73,10 +73,10 @@ export function HeroSection({ screen, onStart }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-col items-start sm:flex-row sm:flex-wrap sm:justify-center sm:items-center gap-2 sm:gap-x-6 sm:gap-y-2 mb-6 sm:mb-10 mx-auto w-fit"
+          className="flex flex-col items-start sm:flex-row sm:flex-wrap sm:justify-center sm:items-center gap-2.5 sm:gap-x-6 sm:gap-y-2 mb-6 sm:mb-10 px-2 sm:px-0 sm:mx-auto sm:w-fit"
         >
           {checkmarks.map((text) => (
-            <div key={text} className="flex items-center gap-2 text-white/80">
+            <div key={text} className="flex items-start sm:items-center gap-2 text-white/80 text-left">
               <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
                 <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-green-400" strokeWidth={3} />
               </div>
@@ -132,7 +132,7 @@ export function HeroSection({ screen, onStart }: HeroSectionProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 1.2 }}
-        className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 cursor-pointer group"
+        className="absolute bottom-1 sm:bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 cursor-pointer group"
       >
         <span className="text-xs sm:text-xs text-white/60 font-medium tracking-wide group-hover:text-white/80 transition-colors">
           Scroll om meer te lezen
