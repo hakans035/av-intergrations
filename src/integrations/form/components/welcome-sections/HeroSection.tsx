@@ -22,7 +22,7 @@ function scrollToNextSection() {
 
 export function HeroSection({ screen, onStart }: HeroSectionProps) {
   return (
-    <section className="relative min-h-screen min-h-dvh flex flex-col items-center justify-center text-center px-4 sm:px-6 py-12 sm:py-16">
+    <section className="relative min-h-screen min-h-dvh flex flex-col items-center justify-center text-center px-4 sm:px-6 pt-12 pb-6 sm:py-16">
       {/* Main content */}
       <div className="max-w-3xl mx-auto">
         {/* Vrijblijvend indicator */}
