@@ -52,6 +52,7 @@ export function Form({ form, onSubmit }: FormProps) {
   }, [hasWelcomeScreen]);
 
   const handleStart = () => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
     setIsTransitioning(true);
     setTimeout(() => {
       setState('questions');
@@ -248,7 +249,7 @@ export function Form({ form, onSubmit }: FormProps) {
   const progress = calculateProgress();
 
   return (
-    <div className="bg-[#1062eb] text-white min-h-screen min-h-dvh flex flex-col antialiased relative overflow-hidden">
+    <div className={`bg-[#1062eb] text-white min-h-screen min-h-dvh flex flex-col antialiased relative ${state === 'welcome' ? 'overflow-y-auto' : 'overflow-hidden'}`}>
       {/* Background Effects - hidden on mobile for performance */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Gradient orbs */}
@@ -317,11 +318,12 @@ export function Form({ form, onSubmit }: FormProps) {
       </div>
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col justify-center items-center w-full px-4 sm:px-6 md:px-0">
+      <main className={`flex-grow flex flex-col items-center w-full ${state === 'welcome' ? '' : 'justify-center px-4 sm:px-6 md:px-0'}`}>
         <div
           className={`
-            w-full max-w-2xl transform -translate-y-10
+            w-full
             transition-all duration-300 ease-out
+            ${state === 'welcome' ? '' : 'max-w-2xl transform -translate-y-10'}
             ${isTransitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}
           `}
         >

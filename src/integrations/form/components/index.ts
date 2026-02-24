@@ -7,3 +7,4 @@ export { YesNo } from './YesNo';
 export { Checkbox } from './Checkbox';
 export { WelcomeScreenComponent } from './WelcomeScreen';
 export { ThankYouScreenComponent } from './ThankYouScreen';
+export { Accordion } from './Accordion';

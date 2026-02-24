@@ -12,7 +12,7 @@ import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const TO_EMAIL = 'hakan@ambitionvalley.nl';
+const TO_EMAILS = ['hakan@ambitionvalley.nl', 'ramin@ambitionvalley.nl'];
 const FROM_EMAIL = 'Ambition Valley <notifications@ambitionvalley.nl>';
 
 if (!RESEND_API_KEY) {
@@ -27,7 +27,7 @@ function render<P extends object>(Component: React.ComponentType<P>, props: P): 
 }
 
 async function main() {
-  console.log(`\nSending test emails to ${TO_EMAIL}\n`);
+  console.log(`\nSending test emails to ${TO_EMAILS.join(', ')}\n`);
 
   const { BookingConfirmationEmail, getBookingConfirmationSubject } = await import('../src/lib/email/templates/bookingConfirmation');
   const { LeadFollowUpEmail, getLeadFollowUpSubject } = await import('../src/lib/email/templates/leadFollowUp');
@@ -53,7 +53,7 @@ async function main() {
 
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
-      to: [TO_EMAIL],
+      to: TO_EMAILS,
       subject: `[TEST] ${subject}`,
       html,
     });
@@ -81,7 +81,7 @@ async function main() {
 
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
-      to: [TO_EMAIL],
+      to: TO_EMAILS,
       subject: `[TEST] ${subject}`,
       html,
     });

@@ -116,6 +116,15 @@ html {
   }
 }
 
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
 }
@@ -135,6 +144,11 @@ html {
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
+
+.animate-blink {
+  animation: blink 1.5s ease-in-out infinite;
+}
+
 
 /* Staggered animation delays */
 .animation-delay-100 { animation-delay: 100ms; }
