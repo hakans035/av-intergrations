@@ -30,7 +30,7 @@ export function HeroSection({ screen, onStart }: HeroSectionProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-4 sm:mb-6 text-white"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05] sm:leading-[1.1] mb-4 sm:mb-6 text-white"
         >
           {screen.title}
         </motion.h1>
