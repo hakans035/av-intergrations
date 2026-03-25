@@ -8,9 +8,6 @@ import { ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import { BookingCalendar, BookingForm } from '@/integrations/booking/components';
 import type { EventType, TimeSlot, CreateBookingRequest } from '@/integrations/booking/types';
 
-// Slugs that require form completion before booking
-const FORM_REQUIRED_SLUGS = ['gratis-intake', 'gratis-groepsdag-intake'];
-
 interface PageParams {
   slug: string;
 }
@@ -36,18 +33,9 @@ export default function BookingSlugPage({ params }: { params: Promise<PageParams
   // Resolve params
   useEffect(() => {
     params.then((p) => {
-      // Redirect to form if this slug requires form completion and params are missing
-      if (
-        FORM_REQUIRED_SLUGS.includes(p.slug) &&
-        !searchParams.get('name') &&
-        !searchParams.get('email')
-      ) {
-        router.replace('/');
-        return;
-      }
       setSlug(p.slug);
     });
-  }, [params, searchParams, router]);
+  }, [params]);
 
   // Fetch event type
   useEffect(() => {
